@@ -2,11 +2,11 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Van Wallet - VIP Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VAN WALLET</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
-        #tela-login { position: fixed; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 9999; }
+        #tela-login { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
         input#pin { padding: 20px; width: 260px; border-radius: 15px; border: 2px solid #333; background: #111; color: #d4af37; font-size: 24px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 10px; }
         .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; }
@@ -98,18 +98,18 @@
             const nome = document.getElementById('w-nome').value;
             const valor = parseFloat(document.getElementById('w-valor').value);
             if(nome && valor) {
-                const hoje = new Date();
-                const venc = new Date(hoje);
-                venc.setDate(hoje.getDate() + dias);
+                const dataAtual = new Date();
+                const dataVenc = new Date();
+                dataVenc.setDate(dataAtual.getDate() + dias);
                 
                 db.push({
                     id: Date.now(),
                     nome: nome,
-                    dataCriacao: hoje.toLocaleDateString('pt-BR'),
+                    dataCriacao: dataAtual.toLocaleDateString('pt-BR'),
                     capital: valor,
                     baseCobrar: valor * 1.40,
-                    venci: venc.getTime(),
-                    venciFormat: venc.toLocaleDateString('pt-BR')
+                    venci: dataVenc.getTime(),
+                    venciFormat: dataVenc.toLocaleDateString('pt-BR')
                 });
                 localStorage.setItem('van_vFinal', JSON.stringify(db));
                 fecharCadastro(); render();
@@ -122,15 +122,19 @@
             const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
             let multa = diff < 0 ? Math.abs(diff) * 30 : 0;
 
+            // Correção para evitar o undefined em dados antigos
+            const criacao = i.dataCriacao || "Não registrada";
+            const vencimento = i.venciFormat || new Date(i.venci).toLocaleDateString('pt-BR');
+
             alert(
-                `DETALHES DO EMPRÉSTIMO:\n\n` +
+                `DETALHES:\n\n` +
                 `👤 Cliente: ${i.nome}\n` +
-                `📅 Data Início: ${i.dataCriacao}\n` +
+                `📅 Empréstimo: ${criacao}\n` +
+                `🏁 Vencimento: ${vencimento}\n` +
                 `💰 Capital: R$ ${i.capital.toFixed(2)}\n` +
                 `📈 Lucro (40%): R$ ${(i.baseCobrar - i.capital).toFixed(2)}\n` +
-                `🚨 Multa Atraso: R$ ${multa.toFixed(2)}\n` +
-                `🏁 Vencimento: ${i.venciFormat}\n\n` +
-                `VALOR TOTAL A COBRAR: R$ ${(i.baseCobrar + multa).toFixed(2)}`
+                `🚨 Multa: R$ ${multa.toFixed(2)}\n\n` +
+                `TOTAL A COBRAR: R$ ${(i.baseCobrar + multa).toFixed(2)}`
             );
         }
 
@@ -159,7 +163,7 @@
                 somaTotal += valorFinal;
                 lista.innerHTML += `
                     <div class="cliente-card ${classe}">
-                        ${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa} MULTA</div>` : ''}
+                        ${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}
                         <div>
                             <span style="font-weight: 600;">${i.nome}</span><br>
                             <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span>
@@ -173,7 +177,7 @@
             });
             document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         }
-        function remover(id) { if(confirm("Confirmar recebimento?")) { db = db.filter(c => c.id !== id); localStorage.setItem('van_vFinal', JSON.stringify(db)); render(); } }
+        function remover(id) { if(confirm("Dar baixa neste cliente?")) { db = db.filter(c => c.id !== id); localStorage.setItem('van_vFinal', JSON.stringify(db)); render(); } }
     </script>
 </body>
 </html>
