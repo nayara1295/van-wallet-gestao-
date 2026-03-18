@@ -5,104 +5,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Van Wallet - Private Banking</title>
     <style>
-        /* ESTILO DARK PREMIUM */
-        body, html { 
-            margin: 0; padding: 0; height: 100%; 
-            background: #000; font-family: 'Inter', sans-serif; color: #e0e0e0;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', -apple-system, sans-serif; color: #e0e0e0; overflow-x: hidden; }
         
-        /* TELA DE LOGIN */
-        #tela-login {
-            position: fixed; width: 100%; height: 100%; display: flex;
-            flex-direction: column; align-items: center; justify-content: center;
-            background: #000; z-index: 1000; text-align: center;
-        }
-
-        .logo-svg { width: 80px; height: 80px; margin-bottom: 20px; }
-        h1 { font-size: 22px; letter-spacing: 3px; color: #fff; margin: 0; }
+        /* LOGIN */
+        #tela-login { position: fixed; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 3000; }
+        .logo-svg { width: 60px; height: 60px; margin-bottom: 20px; }
         
-        input { 
-            padding: 18px; width: 250px; font-size: 22px; text-align: center; 
-            border-radius: 12px; border: 1px solid #222; background: #080808; color: #d4af37;
-            margin: 30px 0 15px; letter-spacing: 10px; outline: none;
-        }
+        /* INPUTS E BOTÕES */
+        input { padding: 18px; width: 280px; border-radius: 15px; border: 1px solid #222; background: #0a0a0a; color: #d4af37; font-size: 18px; text-align: center; outline: none; transition: 0.3s; margin-bottom: 15px; }
+        input:focus { border-color: #d4af37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); }
+        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 16px; text-transform: uppercase; }
+        
+        /* DASHBOARD */
+        #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; }
+        .card-total { background: linear-gradient(145deg, #111, #050505); padding: 30px; border-radius: 25px; border: 1px solid #1a1a1a; text-align: center; margin: 20px 0; }
+        
+        /* WIZARD (PASSO A PASSO) */
+        #modal-wizard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; flex-direction: column; align-items: center; justify-content: center; }
+        .step { display: none; text-align: center; width: 100%; animation: fadeIn 0.4s; }
+        .step.active { display: block; }
+        .btn-prazo { background: transparent; border: 1px solid #d4af37; color: #d4af37; padding: 15px; width: 200px; border-radius: 12px; margin: 5px; font-weight: 600; cursor: pointer; }
+        .btn-prazo:active { background: #d4af37; color: #000; }
 
-        .btn-acessar {
-            padding: 16px; width: 250px; background: #fff; color: #000; border: none;
-            border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;
-        }
+        /* LISTA CLIENTES */
+        .cliente-card { background: #080808; border: 1px solid #151515; padding: 20px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .pago-chip { font-size: 10px; color: #666; border: 1px solid #333; padding: 4px 8px; border-radius: 5px; cursor: pointer; }
 
-        /* DASHBOARD (ESCONDIDO) */
-        #conteudo-privado { 
-            display: none; padding: 20px; max-width: 500px; margin: 0 auto;
-        }
-
-        .card-topo {
-            background: linear-gradient(145deg, #0f0f0f, #050505);
-            padding: 25px; border-radius: 20px; border: 1px solid #1a1a1a;
-            margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .label { color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .valor-principal { font-size: 36px; font-weight: 700; color: #fff; margin: 10px 0; }
-        .juros-detalhe { color: #d4af37; font-size: 14px; }
-
-        .btn-acao {
-            width: 100%; padding: 15px; background: #111; color: #fff; 
-            border: 1px solid #333; border-radius: 12px; margin-top: 20px; cursor: pointer;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div id="tela-login">
-        <div class="logo-svg">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 85L20 50H35V15H65V50H80L50 85Z" stroke="#d4af37" stroke-width="4" stroke-linejoin="round"/>
-                <circle cx="50" cy="50" r="10" stroke="#d4af37" stroke-width="3" />
-            </svg>
-        </div>
+        <div class="logo-svg"><svg viewBox="0 0 100 100" fill="none"><path d="M50 85L20 50H35V15H65V50H80L50 85Z" stroke="#d4af37" stroke-width="4"/><circle cx="50" cy="50" r="10" stroke="#d4af37" stroke-width="3"/></svg></div>
         <h1>VAN WALLET</h1>
-        <input type="password" id="campo-senha" placeholder="••••••" maxlength="6">
-        <button class="btn-acessar" onclick="fazerLogin()">CONECTAR</button>
-        <p id="mensagem-erro" style="color: #ff4d4d; font-size: 12px; margin-top: 15px;"></p>
+        <input type="password" id="pin" placeholder="PIN" maxlength="6" style="letter-spacing: 12px; margin-top: 30px;">
+        <button class="btn-gold" onclick="login()">CONECTAR</button>
     </div>
 
     <div id="conteudo-privado">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="color: #d4af37; font-weight: 600;">Painel Administrativo</span>
-            <button onclick="location.reload()" style="background:none; border:none; color:#666; cursor:pointer;">Sair</button>
+        <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+            <small style="color: #d4af37; font-weight: 700;">VAN WALLET <span style="color:#555">v2.0</span></small>
+            <small onclick="location.reload()" style="color:#444">SAIR</small>
         </div>
 
-        <div class="card-topo">
-            <div class="label">Dinheiro na Rua (Total)</div>
-            <div class="valor-principal" id="display-total">R$ 0,00</div>
-            <div class="juros-detalhe">↑ Rendendo juros hoje</div>
+        <div class="card-total">
+            <small style="color: #666; text-transform: uppercase;">Total Investido</small>
+            <h1 id="total-rua" style="font-size: 42px; margin: 10px 0; color: #fff;">R$ 0,00</h1>
         </div>
 
-        <button class="btn-acao" onclick="alert('Funcionalidade: Adicionar Cliente')">
-            + Novo Empréstimo
-        </button>
+        <button class="btn-gold" style="width: 100%;" onclick="startWizard()">+ NOVO EMPRÉSTIMO</button>
 
-        <div style="margin-top: 30px;">
-            <div class="label">Lista de Clientes</div>
-            <p style="color: #444; text-align: center; margin-top: 20px;">Nenhum cliente cadastrado ainda.</p>
+        <div style="margin-top: 40px;">
+            <p style="font-size: 12px; color: #d4af37; letter-spacing: 2px;">CARTEIRA ATIVA</p>
+            <div id="lista-clientes"></div>
+        </div>
+    </div>
+
+    <div id="modal-wizard">
+        <div id="step-1" class="step active">
+            <p style="color: #888;">PASSO 1</p>
+            <h2 style="margin-bottom: 30px;">Qual o nome do cliente?</h2>
+            <input type="text" id="w-nome" placeholder="Digite o nome completo">
+            <br><br>
+            <button class="btn-gold" onclick="nextStep(2)">PRÓXIMO</button>
+            <p onclick="closeWizard()" style="margin-top: 20px; color: #444; font-size: 14px;">Cancelar</p>
+        </div>
+
+        <div id="step-2" class="step">
+            <p style="color: #888;">PASSO 2</p>
+            <h2 id="display-nome-top" style="color: #d4af37;"></h2>
+            <h2 style="margin-bottom: 30px;">Qual o valor do capital?</h2>
+            <input type="number" id="w-valor" placeholder="R$ 0,00">
+            <br><br>
+            <button class="btn-gold" onclick="nextStep(3)">PRÓXIMO</button>
+        </div>
+
+        <div id="step-3" class="step">
+            <p style="color: #888;">PASSO FINAL</p>
+            <h2 style="margin-bottom: 30px;">Selecione o prazo:</h2>
+            <button class="btn-prazo" onclick="finishWizard(7)">7 DIAS</button><br>
+            <button class="btn-prazo" onclick="finishWizard(15)">15 DIAS</button><br>
+            <button class="btn-prazo" onclick="finishWizard(30)">30 DIAS</button>
         </div>
     </div>
 
     <script>
-        const SENHA_MESTRE = "102030"; // Altere sua senha aqui!
+        const PIN_CORRETO = "102030";
+        let db = JSON.parse(localStorage.getItem('van_db')) || [];
 
-        function fazerLogin() {
-            const senha = document.getElementById('campo-senha').value;
-            const erro = document.getElementById('mensagem-erro');
-
-            if (senha === SENHA_MESTRE) {
+        function login() {
+            if(document.getElementById('pin').value === PIN_CORRETO) {
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('conteudo-privado').style.display = 'block';
-            } else {
-                erro.innerText = "PIN INCORRETO";
-                document.getElementById('campo-senha').value = "";
+                render();
+            }
+        }
+
+        // FUNÇÕES DO WIZARD
+        function startWizard() {
+            document.getElementById('modal-wizard').style.display = 'flex';
+            resetSteps();
+        }
+
+        function closeWizard() { document.getElementById('modal-wizard').style.display = 'none'; }
+
+        function nextStep(n) {
+            const nome = document.getElementById('w-nome').value;
+            if(n === 2 && nome === "") return alert("Digite o nome");
+            
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-' + n).classList.add('active');
+            document.getElementById('display-nome-top').innerText = nome;
+        }
+
+        function resetSteps() {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-1').classList.add('active');
+            document.getElementById('w-nome').value = "";
+            document.getElementById('w-valor').value = "";
+        }
+
+        function finishWizard(dias) {
+            const nome = document.getElementById('w-nome').value;
+            const valor = parseFloat(document.getElementById('w-valor').value);
+            
+            if(nome && valor) {
+                const dataVenc = new Date();
+                dataVenc.setDate(dataVenc.getDate() + dias);
+
+                const novo = {
+                    id: Date.now(),
+                    nome,
+                    valor,
+                    prazo: dias,
+                    vencimento: dataVenc.toLocaleDateString('pt-BR')
+                };
+
+                db.push(novo);
+                localStorage.setItem('van_db', JSON.stringify(db));
+                closeWizard();
+                render();
+            }
+        }
+
+        function render() {
+            const lista = document.getElementById('lista-clientes');
+            const totalText = document.getElementById('total-rua');
+            lista.innerHTML = "";
+            let soma = 0;
+
+            db.forEach(item => {
+                soma += item.valor;
+                lista.innerHTML += `
+                    <div class="cliente-card">
+                        <div>
+                            <span style="font-size: 16px; font-weight: 600;">${item.nome}</span><br>
+                            <span style="color: #d4af37; font-size: 18px; font-weight: 700;">R$ ${item.valor.toFixed(2)}</span><br>
+                            <span style="color: #555; font-size: 11px;">Vence em ${item.vencimento} (${item.prazo} dias)</span>
+                        </div>
+                        <div class="pago-chip" onclick="remover(${item.id})">BAIXA</div>
+                    </div>
+                `;
+            });
+            totalText.innerText = "R$ " + soma.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        }
+
+        function remover(id) {
+            if(confirm("Deseja dar baixa neste pagamento?")) {
+                db = db.filter(i => i.id !== id);
+                localStorage.setItem('van_db', JSON.stringify(db));
+                render();
             }
         }
     </script>
