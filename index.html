@@ -5,74 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Van Wallet - Private Banking</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', -apple-system, sans-serif; color: #e0e0e0; overflow-x: hidden; }
-        
-        /* LOGIN */
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #e0e0e0; overflow-x: hidden; }
         #tela-login { position: fixed; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 3000; }
         input { padding: 18px; width: 280px; border-radius: 15px; border: 1px solid #222; background: #0a0a0a; color: #d4af37; font-size: 18px; text-align: center; outline: none; margin-bottom: 15px; }
-        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        
-        /* DASHBOARD */
+        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
         #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; }
         .card-total { background: linear-gradient(145deg, #111, #050505); padding: 30px; border-radius: 25px; border: 1px solid #1a1a1a; text-align: center; margin: 20px 0; }
-        
-        /* WIZARD (FLUXO GUIADO) */
         #modal-wizard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; }
         .step { display: none; text-align: center; width: 100%; animation: fadeIn 0.3s; }
         .step.active { display: block; }
-        .btn-prazo { background: transparent; border: 2px solid #d4af37; color: #d4af37; padding: 18px; width: 240px; border-radius: 15px; margin: 10px; font-weight: 700; cursor: pointer; font-size: 16px; }
-
-        /* CARDS DINÂMICOS */
-        .cliente-card { border-radius: 20px; margin-bottom: 15px; padding: 22px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; transition: 0.3s; }
+        .btn-prazo { background: transparent; border: 2px solid #d4af37; color: #d4af37; padding: 18px; width: 240px; border-radius: 15px; margin: 10px; font-weight: 700; cursor: pointer; }
+        
+        .cliente-card { border-radius: 20px; margin-bottom: 15px; padding: 22px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
         .card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
-        .card-atencao { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
-        .card-alerta { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; box-shadow: 0 0 20px rgba(255, 77, 77, 0.2); }
+        .card-atencao { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
+        .card-alerta { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; }
 
-        .status-txt { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 5px; }
-        .baixa-btn { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 12px 18px; border-radius: 12px; font-size: 11px; cursor: pointer; font-weight: bold; }
-
+        .status-txt { font-size: 13px; font-weight: 800; text-transform: uppercase; display: block; margin-top: 5px; }
+        .baixa-btn { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 12px; border-radius: 12px; font-size: 11px; cursor: pointer; font-weight: bold; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div id="tela-login">
-        <h1 style="letter-spacing: 6px; color:#fff; font-size: 28px; margin-bottom: 40px;">VAN WALLET</h1>
+        <h1 style="color:#fff">VAN WALLET</h1>
         <input type="password" id="pin" placeholder="PIN" maxlength="6" style="letter-spacing: 15px;">
         <button class="btn-gold" onclick="login()">CONECTAR</button>
     </div>
 
     <div id="conteudo-privado">
-        <div style="display: flex; justify-content: space-between; padding: 10px 0;">
-            <small style="color: #d4af37; font-weight: 700;">PRIVATE BANKING</small>
-            <small onclick="location.reload()" style="color:#444">SAIR</small>
-        </div>
-
         <div class="card-total">
             <small style="color: #666;">CAPITAL ATIVO</small>
             <h1 id="total-rua" style="font-size: 42px; margin: 10px 0;">R$ 0,00</h1>
         </div>
-
         <button class="btn-gold" style="width: 100%;" onclick="startWizard()">+ NOVO EMPRÉSTIMO</button>
-
-        <div style="margin-top: 40px;">
-            <p style="font-size: 11px; color: #555; letter-spacing: 3px; text-align: center; text-transform: uppercase;">Gestão de Clientes</p>
-            <div id="lista-clientes"></div>
-        </div>
+        <div style="margin-top: 30px;" id="lista-clientes"></div>
     </div>
 
     <div id="modal-wizard">
         <div id="step-1" class="step active">
             <h2>Nome do Cliente</h2>
             <input type="text" id="w-nome" placeholder="Nome">
-            <br><button class="btn-gold" style="margin-top: 20px;" onclick="nextStep(2)">PRÓXIMO</button>
-            <p onclick="closeWizard()" style="color:#444; margin-top:25px; cursor:pointer;">Cancelar</p>
+            <br><button class="btn-gold" onclick="nextStep(2)">PRÓXIMO</button>
+            <p onclick="closeWizard()" style="color:#444; margin-top:25px;">Cancelar</p>
         </div>
         <div id="step-2" class="step">
             <h2 id="display-nome-top" style="color:#d4af37"></h2>
             <h2>Qual o Valor?</h2>
             <input type="number" id="w-valor" placeholder="R$ 0,00">
-            <br><button class="btn-gold" style="margin-top: 20px;" onclick="nextStep(3)">PRÓXIMO</button>
+            <br><button class="btn-gold" onclick="nextStep(3)">PRÓXIMO</button>
         </div>
         <div id="step-3" class="step">
             <h2>Prazo de Retorno</h2>
@@ -96,35 +78,23 @@
 
         function startWizard() { document.getElementById('modal-wizard').style.display = 'flex'; resetSteps(); }
         function closeWizard() { document.getElementById('modal-wizard').style.display = 'none'; }
-        
         function nextStep(n) {
-            if(n === 2 && document.getElementById('w-nome').value === "") return;
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-' + n).classList.add('active');
             document.getElementById('display-nome-top').innerText = document.getElementById('w-nome').value;
         }
-
-        function resetSteps() { 
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active')); 
-            document.getElementById('step-1').classList.add('active'); 
-            document.getElementById('w-nome').value = ""; 
-            document.getElementById('w-valor').value = ""; 
-        }
+        function resetSteps() { document.querySelectorAll('.step').forEach(s => s.classList.remove('active')); document.getElementById('step-1').classList.add('active'); }
 
         function finishWizard(dias) {
             const nome = document.getElementById('w-nome').value;
             const valor = parseFloat(document.getElementById('w-valor').value);
             if(nome && valor) {
                 const hoje = new Date();
-                const venci = new Date();
+                hoje.setHours(0,0,0,0); 
+                const venci = new Date(hoje);
                 venci.setDate(hoje.getDate() + dias);
-                db.push({ 
-                    id: Date.now(), 
-                    nome, 
-                    valor, 
-                    venci: venci.getTime(), 
-                    criacao: hoje.toLocaleDateString('pt-BR') 
-                });
+                
+                db.push({ id: Date.now(), nome, valor, venci: venci.getTime() });
                 localStorage.setItem('van_db', JSON.stringify(db));
                 closeWizard(); render();
             }
@@ -134,14 +104,39 @@
             const lista = document.getElementById('lista-clientes');
             lista.innerHTML = "";
             let soma = 0;
-            const hB = new Date();
-            const hoje = new Date(hB.getFullYear(), hB.getMonth(), hB.getDate()).getTime();
+            const agora = new Date();
+            agora.setHours(0,0,0,0);
+            const hojeTs = agora.getTime();
 
             db.sort((a, b) => a.venci - b.venci);
 
             db.forEach(item => {
                 soma += item.valor;
-                const dTime = item.venci - hoje;
-                const dDays = Math.round(dTime / (1000 * 60 * 60 * 24));
+                // Calculando a diferença em dias de forma simples
+                const diffMillis = item.venci - hojeTs;
+                const diffDays = Math.ceil(diffMillis / (1000 * 60 * 60 * 24));
                 
-                let cCls =
+                let cCls = "card-ok", sTxt = `Faltam ${diffDays} dias`, cTxt = "#00ff00";
+
+                if (diffDays === 0) { 
+                    cCls = "card-atencao"; sTxt = "VENCE HOJE"; cTxt = "#fff"; 
+                } else if (diffDays < 0) { 
+                    cCls = "card-alerta"; sTxt = `ATRASADO ${Math.abs(diffDays)} DIAS`; cTxt = "#fff"; 
+                }
+
+                lista.innerHTML += `
+                    <div class="cliente-card ${cCls}">
+                        <div>
+                            <span style="font-weight: 600;">${item.nome}</span><br>
+                            <span style="font-size: 22px; font-weight: 900; display:block; margin: 4px 0;">R$ ${item.valor.toFixed(2)}</span>
+                            <span class="status-txt" style="color: ${cTxt}">${sTxt}</span>
+                        </div>
+                        <button class="baixa-btn" onclick="remover(${item.id})">BAIXA</button>
+                    </div>`;
+            });
+            document.getElementById('total-rua').innerText = "R$ " + soma.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        }
+        function remover(id) { if(confirm("Confirmar recebimento?")) { db = db.filter(i => i.id !== id); localStorage.setItem('van_db', JSON.stringify(db)); render(); } }
+    </script>
+</body>
+</html>
