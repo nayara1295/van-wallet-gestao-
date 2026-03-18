@@ -5,41 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Van Wallet - VIP Control</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #e0e0e0; overflow-x: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
         
-        /* LOGIN ESTILIZADO */
+        /* LOGIN */
         #tela-login { position: fixed; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 9999; }
-        input#pin { padding: 20px; width: 280px; border-radius: 15px; border: 1px solid #222; background: #0a0a0a; color: #d4af37; font-size: 22px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 15px; }
-        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        input#pin { padding: 20px; width: 260px; border-radius: 15px; border: 2px solid #333; background: #111; color: #d4af37; font-size: 24px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 10px; }
+        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         
-        /* DASHBOARD PRINCIPAL */
+        /* DASHBOARD */
         #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; }
-        .card-total { background: linear-gradient(145deg, #111, #050505); padding: 30px; border-radius: 25px; border: 1px solid #1a1a1a; text-align: center; margin: 20px 0; }
+        .card-total { background: linear-gradient(145deg, #151515, #050505); padding: 30px; border-radius: 25px; border: 1px solid #222; text-align: center; margin: 20px 0; }
         
+        /* INPUTS DO CADASTRO (CORRIGIDO PARA VER AS LETRAS) */
+        .input-cadastro { 
+            padding: 18px; 
+            width: 85%; 
+            border-radius: 12px; 
+            border: 2px solid #d4af37; 
+            background: #1a1a1a; /* Fundo cinza escuro */
+            color: #ffffff !important; /* LETRAS BRANCAS */
+            font-size: 20px; 
+            text-align: center; 
+            outline: none; 
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         /* CARDS DOS CLIENTES */
-        .cliente-card { border-radius: 22px; margin-bottom: 15px; padding: 22px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; position: relative; overflow: hidden; }
+        .cliente-card { border-radius: 22px; margin-bottom: 15px; padding: 22px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; position: relative; }
         .card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
         .card-hoje { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
         .card-atraso { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; }
 
         .valor-receber { font-size: 26px; font-weight: 900; color: #fff; display: block; margin: 5px 0; }
-        .multa-alerta { font-size: 10px; background: #ff4d4d; color: #fff; padding: 3px 8px; border-radius: 20px; font-weight: bold; position: absolute; top: 15px; right: 15px; }
-        .status-txt { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .multa-alerta { font-size: 10px; background: #ff4d4d; color: #fff; padding: 4px 10px; border-radius: 20px; font-weight: bold; position: absolute; top: 15px; right: 15px; }
         
-        /* MODAL WIZARD (CADASTRO BONITO) */
-        #modal-wizard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 5000; flex-direction: column; align-items: center; justify-content: center; }
-        .step { display: none; text-align: center; width: 100%; animation: fadeIn 0.3s; }
+        /* MODAL WIZARD */
+        #modal-wizard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 5000; flex-direction: column; align-items: center; justify-content: center; }
+        .step { display: none; text-align: center; width: 100%; }
         .step.active { display: block; }
         .btn-prazo { background: transparent; border: 2px solid #d4af37; color: #d4af37; padding: 18px; width: 240px; border-radius: 15px; margin: 10px; font-weight: 700; font-size: 16px; }
-        .baixa-btn { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 12px 18px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .baixa-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 12px 18px; border-radius: 12px; font-size: 11px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div id="tela-login">
-        <h1 style="letter-spacing: 6px; color:#fff; font-size: 28px; margin-bottom: 40px;">VAN WALLET</h1>
+        <h1 style="letter-spacing: 5px; color:#fff;">VAN WALLET</h1>
         <input type="password" id="pin" placeholder="PIN" maxlength="6">
         <button class="btn-gold" onclick="login()">ACESSAR</button>
     </div>
@@ -55,19 +69,19 @@
 
     <div id="modal-wizard">
         <div id="step-1" class="step active">
-            <h2>Nome do Cliente</h2>
-            <input type="text" id="w-nome" placeholder="Nome" style="width: 80%; border-bottom: 2px solid #d4af37; background:transparent; border-top:none; border-left:none; border-right:none; border-radius:0; letter-spacing:0;">
+            <h2 style="color:#fff">Nome do Cliente</h2>
+            <input type="text" id="w-nome" class="input-cadastro" placeholder="Digite o nome...">
             <br><button class="btn-gold" style="margin-top: 30px;" onclick="nextStep(2)">PRÓXIMO</button>
-            <p onclick="fecharCadastro()" style="color:#444; margin-top:30px">Cancelar</p>
+            <p onclick="fecharCadastro()" style="color:#666; margin-top:30px; cursor:pointer;">Cancelar</p>
         </div>
         <div id="step-2" class="step">
             <h2 id="nome-topo" style="color:#d4af37"></h2>
-            <h2>Qual o Valor?</h2>
-            <input type="number" id="w-valor" placeholder="R$ 0,00" style="width: 80%; border-bottom: 2px solid #d4af37; background:transparent; border-top:none; border-left:none; border-right:none; border-radius:0; letter-spacing:0;">
+            <h2 style="color:#fff">Qual o Valor?</h2>
+            <input type="number" id="w-valor" class="input-cadastro" placeholder="R$ 0,00">
             <br><button class="btn-gold" style="margin-top: 30px;" onclick="nextStep(3)">PRÓXIMO</button>
         </div>
         <div id="step-3" class="step">
-            <h2>Prazo de Retorno</h2>
+            <h2 style="color:#fff">Prazo de Retorno</h2>
             <button class="btn-prazo" onclick="finalizar(7)">7 DIAS</button>
             <button class="btn-prazo" onclick="finalizar(15)">15 DIAS</button>
             <button class="btn-prazo" onclick="finalizar(30)">30 DIAS</button>
@@ -90,6 +104,7 @@
         function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
         
         function nextStep(n) {
+            if(n === 2 && document.getElementById('w-nome').value === "") return;
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-' + n).classList.add('active');
             document.getElementById('nome-topo').innerText = document.getElementById('w-nome').value;
@@ -110,13 +125,7 @@
                 const venc = new Date(hoje);
                 venc.setDate(hoje.getDate() + dias);
                 
-                db.push({
-                    id: Date.now(),
-                    nome: nome,
-                    capital: valor,
-                    baseCobrar: valor * 1.40,
-                    venci: venc.getTime()
-                });
+                db.push({ id: Date.now(), nome: nome, capital: valor, baseCobrar: valor * 1.40, venci: venc.getTime() });
                 localStorage.setItem('van_vFinal', JSON.stringify(db));
                 fecharCadastro(); render();
             }
@@ -126,8 +135,7 @@
             const lista = document.getElementById('lista-clientes');
             lista.innerHTML = "";
             let somaTotal = 0;
-            const agora = new Date(); agora.setHours(0,0,0,0);
-            const hojeTs = agora.getTime();
+            const hojeTs = new Date().setHours(0,0,0,0);
 
             db.sort((a, b) => a.venci - b.venci);
 
@@ -146,28 +154,20 @@
                 }
 
                 somaTotal += valorFinal;
-
                 lista.innerHTML += `
                     <div class="cliente-card ${classe}">
                         ${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa} MULTA</div>` : ''}
                         <div>
-                            <span style="font-weight: 600; font-size: 16px;">${i.nome}</span><br>
+                            <span style="font-weight: 600;">${i.nome}</span><br>
                             <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span>
-                            <span class="status-txt" style="color: ${corTxt}">${statusTxt}</span>
+                            <span style="color: ${corTxt}; font-size:12px; font-weight:800;">${statusTxt}</span>
                         </div>
                         <button class="baixa-btn" onclick="remover(${i.id})">BAIXA</button>
                     </div>`;
             });
             document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         }
-
-        function remover(id) {
-            if(confirm("Confirmar recebimento total?")) {
-                db = db.filter(c => c.id !== id);
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                render();
-            }
-        }
+        function remover(id) { if(confirm("Confirmar recebimento?")) { db = db.filter(c => c.id !== id); localStorage.setItem('van_vFinal', JSON.stringify(db)); render(); } }
     </script>
 </body>
 </html>
