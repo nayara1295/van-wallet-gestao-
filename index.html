@@ -2,257 +2,166 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Van Wallet - Private Banking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Van Wallet - Private</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #e0e0e0; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: sans-serif; color: #e0e0e0; overflow-x: hidden; }
         
-        /* TELA DE LOGIN */
-        #tela-login { position: fixed; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 10000; text-align: center; }
-        .logo-svg { width: 80px; height: 80px; margin-bottom: 20px; }
-        h1 { font-size: 20px; letter-spacing: 4px; color: #fff; margin: 0; font-weight: 300; }
-        #campo-senha-login { padding: 18px; width: 250px; font-size: 24px; text-align: center; border-radius: 12px; border: 1px solid #333; background: #0a0a0a; color: #d4af37; margin: 30px 0 15px; letter-spacing: 8px; outline: none; }
-        .btn-acessar { padding: 16px; width: 250px; background: #fff; color: #000; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        /* LOGIN */
+        #tela-login { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 9999; }
+        #campo-senha-login { padding: 18px; width: 220px; font-size: 24px; text-align: center; border-radius: 12px; border: 1px solid #333; background: #0a0a0a; color: #d4af37; margin-bottom: 20px; outline: none; letter-spacing: 8px; }
+        .btn-acao { padding: 16px 45px; background: #fff; color: #000; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
 
-        /* CONTEÚDO PRINCIPAL */
-        #conteudo-privado { display: none; padding: 20px; max-width: 500px; margin: 0 auto; height: 100vh; overflow-y: auto; }
-        .card-topo { background: linear-gradient(145deg, #0f0f0f, #050505); padding: 20px; border-radius: 20px; border: 1px solid #1a1a1a; margin-top: 15px; position: relative; }
-        .label { color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; }
-        .valor-principal { font-size: 32px; font-weight: 700; color: #fff; margin: 10px 0; }
+        /* APP */
+        #conteudo-privado { display: none; padding: 20px; max-width: 500px; margin: 0 auto; height: 100vh; overflow-y: auto; box-sizing: border-box; }
+        .card { background: linear-gradient(145deg, #0f0f0f, #050505); padding: 20px; border-radius: 20px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
+        .valor-total { font-size: 32px; font-weight: bold; color: #fff; margin: 10px 0; }
         
-        .status-em-dia { border-left: 5px solid #2ecc71; }
-        .status-vence-hoje { border-left: 5px solid #f1c40f; }
-        .status-vencido { border-left: 5px solid #e74c3c; }
-        
-        .container-botoes { display: flex; gap: 10px; margin-top: 15px; }
-        .mini-card { flex: 1; padding: 12px; border-radius: 10px; text-align: center; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid #222; }
-        .btn-pago { background: #1b4d2e; color: #2ecc71; }
-        .btn-inf { background: #1a1a1a; color: #d4af37; }
+        /* STATUS */
+        .atraso { border-left: 6px solid #e74c3c; }
+        .dia { border-left: 6px solid #2ecc71; }
+        .hoje { border-left: 6px solid #f1c40f; }
 
-        /* INPUTS DE CADASTRO */
-        .input-step { width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #222; background: #080808; color: #fff; font-size: 16px; outline: none; box-sizing: border-box; }
-        .btn-prazo { flex: 1; padding: 18px; background: #111; color: #d4af37; border: 1px solid #333; border-radius: 12px; font-size: 16px; font-weight: 700; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-mini { flex: 1; padding: 12px; border-radius: 10px; text-align: center; font-size: 11px; font-weight: bold; border: 1px solid #222; cursor: pointer; }
         
-        /* MODAL CUSTOMIZADO (SUBSTITUI O ALERT/PROMPT) */
-        #modal-custom { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: #0a0a0a; border: 1px solid #d4af37; padding: 25px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; }
-        .modal-titulo { color: #d4af37; font-size: 14px; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px; }
-        .modal-corpo { font-size: 14px; color: #ccc; line-height: 1.6; margin-bottom: 20px; text-align: left; }
-        .btn-modal { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .dot-verde { background: #2ecc71; }
-        .dot-amarelo { background: #f1c40f; }
-        .dot-vermelho { background: #e74c3c; }
+        /* MODAL (ESCONDE O GITHUB) */
+        #janela-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
+        .caixa-alerta { background: #0a0a0a; border: 1px solid #d4af37; padding: 25px; border-radius: 20px; width: 100%; max-width: 340px; }
+        .titulo-alerta { color: #d4af37; font-weight: bold; margin-bottom: 15px; font-size: 14px; text-align: center; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .texto-alerta { font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div id="tela-login">
-        <div class="logo-svg">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 85L20 50H35V15H65V50H80L50 85Z" stroke="#d4af37" stroke-width="4" stroke-linejoin="round"/>
-                <circle cx="50" cy="50" r="10" stroke="#d4af37" stroke-width="3" />
-            </svg>
-        </div>
-        <h1>VAN WALLET</h1>
-        <input type="password" id="campo-senha-login" placeholder="••••••" maxlength="6" inputmode="numeric">
-        <button class="btn-acessar" onclick="fazerLogin()">CONECTAR</button>
-        <p id="msg-erro-login" style="color: #ff4d4d; font-size: 11px; margin-top: 15px; height: 15px;"></p>
+        <h2 style="color:#fff; letter-spacing: 4px; font-weight: 300; margin-bottom: 30px;">VAN WALLET</h2>
+        <input type="password" id="campo-senha-login" placeholder="••••" maxlength="6" inputmode="numeric">
+        <button class="btn-acao" onclick="logar()">CONECTAR</button>
     </div>
 
     <div id="conteudo-privado">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <span style="color: #d4af37; font-weight: 600; font-size: 11px; letter-spacing: 1px;">PRIVATE BANKING</span>
-            <button onclick="logout()" style="background:none; border:none; color:#555; cursor:pointer; font-size: 11px;">Logout</button>
+        <div class="card">
+            <div style="font-size:10px; color:#666; letter-spacing:2px;">DINHEIRO NA RUA</div>
+            <div class="valor-total" id="soma-total">R$ 0,00</div>
         </div>
 
-        <div class="card-topo">
-            <div class="label">Dinheiro na Rua</div>
-            <div class="valor-principal" id="display-total">R$ 0,00</div>
-        </div>
-
-        <div class="card-topo" id="card-cadastro" style="border-style: dashed; border-color: #333;">
-            <div id="etapa-nome">
-                <input type="text" id="nome-cliente" class="input-step" placeholder="Nome do Cliente">
-                <button class="btn-acessar" style="width: 100%; margin-top: 15px; background: #d4af37; color: #000;" onclick="irParaValor()">PRÓXIMO</button>
-            </div>
-            <div id="etapa-valor" style="display: none;">
-                <input type="number" id="valor-emprestimo" class="input-step" placeholder="Valor R$" style="text-align: center; color: #d4af37; font-size: 22px;">
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button onclick="location.reload()" style="flex: 1; background: none; border: 1px solid #333; color: #666; border-radius: 12px;">Voltar</button>
-                    <button class="btn-acessar" style="flex: 2;" onclick="irParaPrazo()">PRÓXIMO</button>
-                </div>
-            </div>
-            <div id="etapa-prazo" style="display: none;">
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-prazo" onclick="finalizarComPrazo(7)">7D</button>
-                    <button class="btn-prazo" onclick="finalizarComPrazo(15)">15D</button>
-                    <button class="btn-prazo" onclick="finalizarComPrazo(30)">30D</button>
-                </div>
-                <button onclick="abrirDataManual()" style="width:100%; background:none; border:none; color:#444; margin-top:15px; font-size:10px; font-weight: bold;">LANÇAR DATA ANTIGA</button>
-            </div>
-            <div id="etapa-data-manual" style="display: none;">
-                <input type="date" id="data-emprestimo" class="input-step">
-                <div style="display: flex; gap: 5px; margin-top:10px;">
-                    <button class="btn-prazo" onclick="finalizarComDataEIntervalo(7)">7D</button>
-                    <button class="btn-prazo" onclick="finalizarComDataEIntervalo(15)">15D</button>
-                    <button class="btn-prazo" onclick="finalizarComDataEIntervalo(30)">30D</button>
-                </div>
+        <div id="area-cadastro" class="card" style="border-style: dashed; border-color: #333;">
+            <input type="text" id="add-nome" placeholder="Nome do Cliente" style="width:100%; padding:15px; margin-bottom:12px; border-radius:10px; border:1px solid #222; background:#080808; color:#fff; box-sizing: border-box; outline: none;">
+            <input type="number" id="add-valor" placeholder="Valor R$" style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px; border:1px solid #222; background:#080808; color:#d4af37; font-weight: bold; box-sizing: border-box; outline: none;">
+            <div style="display:flex; gap:8px;">
+                <button onclick="salvar(7)" style="flex:1; padding:15px; background:#111; color:#d4af37; border:1px solid #333; border-radius:10px; font-weight: bold;">7D</button>
+                <button onclick="salvar(15)" style="flex:1; padding:15px; background:#111; color:#d4af37; border:1px solid #333; border-radius:10px; font-weight: bold;">15D</button>
+                <button onclick="salvar(30)" style="flex:1; padding:15px; background:#111; color:#d4af37; border:1px solid #333; border-radius:10px; font-weight: bold;">30D</button>
             </div>
         </div>
 
-        <div id="lista-clientes" style="margin-top: 20px; padding-bottom: 50px;"></div>
+        <div id="lista"></div>
     </div>
 
-    <div id="modal-custom">
-        <div class="modal-box" id="modal-box-content">
-            </div>
+    <div id="janela-modal">
+        <div class="caixa-alerta" id="conteudo-modal"></div>
     </div>
 
     <script>
-        const SENHA_MESTRE = "102030";
-        const MULTA_DIARIA = 40.00;
-        let clientes = JSON.parse(localStorage.getItem('clientes_van_wallet')) || [];
-        let idParaRemover = null;
+        const PIN = "102030";
+        const MULTA_VALOR = 40.00;
+        let clientes = JSON.parse(localStorage.getItem('v_data_pro')) || [];
+        let idFoco = null;
 
-        window.onload = function() {
-            if(sessionStorage.getItem('van_logado') === 'true') {
+        function logar() {
+            if(document.getElementById('campo-senha-login').value === PIN) {
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('conteudo-privado').style.display = 'block';
-                renderizarLista();
-            }
-        };
-
-        function fazerLogin() {
-            if (document.getElementById('campo-senha-login').value === SENHA_MESTRE) {
-                sessionStorage.setItem('van_logado', 'true');
-                document.getElementById('tela-login').style.display = 'none';
-                document.getElementById('conteudo-privado').style.display = 'block';
-                renderizarLista();
-            } else {
-                document.getElementById('msg-erro-login').innerText = "PIN INCORRETO";
+                atualizar();
             }
         }
 
-        function logout() { sessionStorage.clear(); location.reload(); }
-        function irParaValor() { if(document.getElementById('nome-cliente').value) { document.getElementById('etapa-nome').style.display='none'; document.getElementById('etapa-valor').style.display='block'; } }
-        function irParaPrazo() { if(document.getElementById('valor-emprestimo').value) { document.getElementById('etapa-valor').style.display='none'; document.getElementById('etapa-prazo').style.display='block'; } }
-        function abrirDataManual() { document.getElementById('etapa-prazo').style.display='none'; document.getElementById('etapa-data-manual').style.display='block'; }
-
-        function finalizarComPrazo(dias) {
+        function salvar(dias) {
+            let n = document.getElementById('add-nome').value;
+            let v = parseFloat(document.getElementById('add-valor').value);
+            if(!n || !v) return;
             let agora = new Date();
             let venc = new Date(); venc.setDate(agora.getDate() + dias);
-            salvar(agora.getTime(), venc.getTime());
-        }
-
-        function finalizarComDataEIntervalo(dias) {
-            let input = document.getElementById('data-emprestimo').value;
-            if(!input) return;
-            let p = input.split('-');
-            let emp = new Date(p[0], p[1]-1, p[2], 12, 0, 0);
-            let venc = new Date(emp); venc.setDate(emp.getDate() + dias);
-            salvar(emp.getTime(), venc.getTime());
-        }
-
-        function salvar(tsEmp, tsVenc) {
-            let n = document.getElementById('nome-cliente').value;
-            let v = parseFloat(document.getElementById('valor-emprestimo').value);
-            clientes.push({ id: Date.now(), nome: n.toUpperCase(), valorOriginal: v, valorRetornoBase: v * 1.40, dataEmprestimo: tsEmp, dataVencimento: tsVenc });
-            localStorage.setItem('clientes_van_wallet', JSON.stringify(clientes));
+            clientes.push({ id: Date.now(), nome: n.toUpperCase(), valor: v, totalBase: v * 1.4, data: agora.getTime(), venc: venc.getTime() });
+            localStorage.setItem('v_data_pro', JSON.stringify(clientes));
             location.reload();
         }
 
-        function renderizarLista() {
-            let lista = document.getElementById('lista-clientes');
-            let displayTotal = document.getElementById('display-total');
-            lista.innerHTML = ''; let totalGeral = 0;
-            let hoje = new Date(); hoje.setHours(0,0,0,0);
+        function atualizar() {
+            let html = ''; let somaGeral = 0; let hoje = new Date(); hoje.setHours(0,0,0,0);
+            clientes.forEach(c => {
+                let dV = new Date(c.venc); dV.setHours(0,0,0,0);
+                let diasAtraso = 0;
+                if(hoje > dV) { diasAtraso = Math.floor((hoje - dV)/(1000*60*60*24)); }
+                let valorFinal = c.totalBase + (diasAtraso * MULTA_VALOR);
+                somaGeral += valorFinal;
+                let status = hoje > dV ? 'atraso' : (hoje.getTime() === dV.getTime() ? 'hoje' : 'dia');
+                
+                // Texto de dias de atraso no card principal
+                let textoAtraso = diasAtraso > 0 ? `<div style="color:#e74c3c; font-size:11px; font-weight:bold; margin-top:5px;">⚠️ ATRASADO: ${diasAtraso} DIA(S)</div>` : '';
 
-            clientes.forEach((c) => {
-                let dVenc = new Date(c.dataVencimento); dVenc.setHours(0,0,0,0);
-                let dEmp = new Date(c.dataEmprestimo);
-                let juros = 0;
-                if (hoje > dVenc) {
-                    let diff = Math.floor((hoje - dVenc) / (1000 * 60 * 60 * 24));
-                    juros = diff * MULTA_DIARIA;
-                }
-                let totalC = c.valorRetornoBase + juros;
-                totalGeral += totalC;
-                let cor = "status-em-dia"; let pto = "dot-verde";
-                if (dVenc.getTime() === hoje.getTime()) { cor = "status-vence-hoje"; pto = "dot-amarelo"; }
-                else if (hoje > dVenc) { cor = "status-vencido"; pto = "dot-vermelho"; }
-
-                lista.innerHTML += `
-                    <div class="card-topo ${cor}">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:bold; font-size:18px;">${c.nome}</span>
-                            <span style="color:#d4af37; font-size:22px; font-weight:700;">R$ ${totalC.toFixed(2)}</span>
-                        </div>
-                        <div style="margin-top:8px; font-size:11px; color:#666;">
-                            <span class="dot ${pto}"></span> Vencimento: ${dVenc.toLocaleDateString('pt-br')}
-                        </div>
-                        <div class="container-botoes">
-                            <div class="mini-card btn-pago" onclick="abrirModalPago(${c.id})">PAGO</div>
-                            <div class="mini-card btn-inf" onclick="abrirModalInf(${c.id})">INF</div>
-                        </div>
+                html += `<div class="card ${status}">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <b style="font-size:16px;">${c.nome}</b> 
+                        <span style="color:#d4af37; font-size:20px; font-weight:bold;">R$ ${valorFinal.toFixed(2)}</span>
                     </div>
-                `;
+                    <div style="margin-top:5px; font-size:10px; color:#555;">VENCIMENTO: ${dV.toLocaleDateString('pt-br')}</div>
+                    ${textoAtraso}
+                    <div class="btn-group">
+                        <div class="btn-mini" style="background:#1b4d2e; color:#2ecc71" onclick="abrirPago(${c.id})">PAGO</div>
+                        <div class="btn-mini" style="background:#1a1a1a; color:#d4af37" onclick="abrirInf(${c.id})">INFO</div>
+                    </div>
+                </div>`;
             });
-            displayTotal.innerText = `R$ ${totalGeral.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
+            document.getElementById('lista').innerHTML = html;
+            document.getElementById('soma-total').innerText = "R$ " + somaGeral.toLocaleString('pt-br', {minimumFractionDigits: 2});
         }
 
-        // --- SISTEMA DE MODAL CUSTOMIZADO (ADEUS NOME DO GITHUB) ---
-        function fecharModal() { document.getElementById('modal-custom').style.display = 'none'; }
-
-        function abrirModalInf(id) {
+        function abrirInf(id) {
             let c = clientes.find(x => x.id === id);
-            let dE = new Date(c.dataEmprestimo);
-            let dV = new Date(c.dataVencimento); dV.setHours(0,0,0,0);
+            let dV = new Date(c.venc); dV.setHours(0,0,0,0);
+            let dE = new Date(c.data);
             let hoje = new Date(); hoje.setHours(0,0,0,0);
-            let jurosAcum = 0;
-            if (hoje > dV) { jurosAcum = Math.floor((hoje - dV) / (1000 * 60 * 60 * 24)) * MULTA_DIARIA; }
-            let dias = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-
-            document.getElementById('modal-box-content').innerHTML = `
-                <div class="modal-titulo">DETALHES DO CLIENTE</div>
-                <div class="modal-corpo">
-                    <b>CLIENTE:</b> ${c.nome}<br>
-                    <b>INVESTIDO:</b> R$ ${c.valorOriginal.toFixed(2)}<br><br>
-                    <b>EMPRESTADO EM:</b><br>${dE.toLocaleDateString('pt-br')} (${dias[dE.getDay()]}) às ${dE.getHours()}:${dE.getMinutes().toString().padStart(2,'0')}<br><br>
-                    <b>VENCIMENTO:</b><br>${dV.toLocaleDateString('pt-br')} (${dias[dV.getDay()]})<br><br>
-                    <b style="color:#e74c3c">MULTA POR ATRASO:</b><br>Regra: R$ 40,00/dia<br>Acumulado: R$ ${jurosAcum.toFixed(2)}
+            let diasAtraso = (hoje > dV) ? Math.floor((hoje - dV)/(1000*60*60*24)) : 0;
+            
+            document.getElementById('conteudo-modal').innerHTML = `
+                <div class="titulo-alerta">INFO DETALHADA</div>
+                <div class="texto-alerta">
+                    <b>Cliente:</b> ${c.nome}<br>
+                    <b>Investido:</b> R$ ${c.valor.toFixed(2)}<br>
+                    <b>Empréstimo:</b> ${dE.toLocaleDateString('pt-br')}<br>
+                    <b>Vencimento:</b> ${dV.toLocaleDateString('pt-br')}<br><br>
+                    <div style="background:#111; padding:10px; border-radius:10px; border:1px solid #333;">
+                        <b style="color:#e74c3c">DIAS DE ATRASO: ${diasAtraso}</b><br>
+                        <b>Multa Diária:</b> R$ 40,00<br>
+                        <b style="color:#d4af37">Multa Total: R$ ${(diasAtraso * 40).toFixed(2)}</b>
+                    </div>
                 </div>
-                <button class="btn-modal" style="background:#d4af37; color:#000;" onclick="fecharModal()">FECHAR</button>
-            `;
-            document.getElementById('modal-custom').style.display = 'flex';
+                <button class="btn-acao" style="width:100%; background:#d4af37; color:#000;" onclick="fechar()">FECHAR</button>`;
+            document.getElementById('janela-modal').style.display = 'flex';
         }
 
-        function abrirModalPago(id) {
-            idParaRemover = id;
-            document.getElementById('modal-box-content').innerHTML = `
-                <div class="modal-titulo">CONFIRMAR PAGAMENTO</div>
-                <div class="modal-corpo" style="text-align:center">Digite a senha para dar baixa e excluir o registro:</div>
-                <input type="password" id="senha-confirm" class="input-step" style="text-align:center; margin-bottom:15px;" placeholder="••••••">
-                <button class="btn-modal" style="background:#2ecc71; color:#000;" onclick="validarExclusao()">BAIXA NO PAGAMENTO</button>
-                <button class="btn-modal" style="background:none; color:#666; border:1px solid #333;" onclick="fecharModal()">CANCELAR</button>
-                <p id="erro-senha-modal" style="color:#ff4d4d; font-size:10px; margin-top:10px;"></p>
-            `;
-            document.getElementById('modal-custom').style.display = 'flex';
-            setTimeout(() => document.getElementById('senha-confirm').focus(), 300);
+        function abrirPago(id) {
+            idFoco = id;
+            document.getElementById('conteudo-modal').innerHTML = `
+                <div class="titulo-alerta">CONFIRMAR PAGO</div>
+                <input type="password" id="senha-pago" class="input-modal" style="width:100%; padding:15px; border-radius:10px; border:1px solid #333; background:#000; color:#fff; text-align:center; box-sizing:border-box;" placeholder="PIN" inputmode="numeric">
+                <button class="btn-acao" style="width:100%; background:#2ecc71; color:#000; margin-top:15px;" onclick="confirmar()">BAIXA</button>
+                <button onclick="fechar()" style="background:none; border:none; color:#555; width:100%; margin-top:15px; font-weight:bold; font-size:10px;">CANCELAR</button>
+                <div id="erro-pago" style="color:#e74c3c; font-size:11px; margin-top:10px; text-align:center;"></div>`;
+            document.getElementById('janela-modal').style.display = 'flex';
         }
 
-        function validarExclusao() {
-            let s = document.getElementById('senha-confirm').value;
-            if (s === SENHA_MESTRE) {
-                clientes = clientes.filter(c => c.id !== idParaRemover);
-                localStorage.setItem('clientes_van_wallet', JSON.stringify(clientes));
-                fecharModal();
-                renderizarLista();
-            } else {
-                document.getElementById('erro-senha-modal').innerText = "SENHA INCORRETA";
-            }
+        function confirmar() {
+            if(document.getElementById('senha-pago').value === PIN) {
+                clientes = clientes.filter(c => c.id !== idFoco);
+                localStorage.setItem('v_data_pro', JSON.stringify(clientes));
+                location.reload();
+            } else { document.getElementById('erro-pago').innerText = "SENHA INCORRETA"; }
         }
+
+        function fechar() { document.getElementById('janela-modal').style.display = 'none'; }
     </script>
 </body>
 </html>
