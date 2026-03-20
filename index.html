@@ -106,6 +106,11 @@
         const MULTA_DIARIA = 40.00;
         let clientes = JSON.parse(localStorage.getItem('clientes_van_wallet')) || [];
 
+        function formatarDataLocal(dataStr) {
+            let partes = dataStr.split('-');
+            return new Date(partes[0], partes[1] - 1, partes[2], 0, 0, 0);
+        }
+
         window.onload = function() {
             if(sessionStorage.getItem('logado') === 'true') {
                 document.getElementById('tela-login').style.display = 'none';
@@ -124,57 +129,87 @@
         }
 
         function logout() { sessionStorage.removeItem('logado'); location.reload(); }
+        
+        // NAVEGAÇÃO ENTRE ETAPAS
         function irParaValor() { if(!document.getElementById('nome-cliente').value) return; document.getElementById('etapa-nome').style.display = 'none'; document.getElementById('etapa-valor').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "VALOR DO EMPRÉSTIMO (2/3)"; }
         function voltarParaNome() { document.getElementById('etapa-valor').style.display = 'none'; document.getElementById('etapa-nome').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "NOVO REGISTRO (1/3)"; }
         function irParaPrazo() { if(!document.getElementById('valor-emprestimo').value) return; document.getElementById('etapa-valor').style.display = 'none'; document.getElementById('etapa-prazo').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "PRAZO DE PAGAMENTO (3/3)"; }
         function voltarParaValor() { document.getElementById('etapa-prazo').style.display = 'none'; document.getElementById('etapa-valor').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "VALOR DO EMPRÉSTIMO (2/3)"; }
-        
         function abrirDataManual() { document.getElementById('etapa-prazo').style.display = 'none'; document.getElementById('etapa-data-manual').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "LANÇAR EMPRÉSTIMO ANTIGO"; }
         function voltarParaPrazo() { document.getElementById('etapa-data-manual').style.display = 'none'; document.getElementById('etapa-prazo').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "PRAZO DE PAGAMENTO (3/3)"; }
 
+        // FINALIZAÇÃO
         function finalizarComPrazo(dias) {
             let dataEmp = new Date(); dataEmp.setHours(0,0,0,0);
-            let dataVenc = new Date(); dataVenc.setHours(0,0,0,0);
+            let dataVenc = new Date(dataEmp);
             dataVenc.setDate(dataVenc.getDate() + dias);
             salvarCliente(dataEmp.getTime(), dataVenc.getTime());
         }
 
         function finalizarComDataEIntervalo(dias) {
             const dataInput = document.getElementById('data-emprestimo').value;
-            if(!dataInput) return alert("Selecione a data do empréstimo!");
-            let dataEmp = new Date(dataInput); dataEmp.setHours(24,0,0,0);
-            let dataVenc = new Date(dataEmp); dataVenc.setDate(dataVenc.getDate() + dias);
+            if(!dataInput) return alert("Selecione a data!");
+            let dataEmp = formatarDataLocal(dataInput);
+            let dataVenc = new Date(dataEmp);
+            dataVenc.setDate(dataVenc.getDate() + dias);
             salvarCliente(dataEmp.getTime(), dataVenc.getTime());
         }
 
         function salvarCliente(tsEmp, tsVenc) {
-            const nome = document.getElementById('nome-cliente').value;
-            const valor = parseFloat(document.getElementById('valor-emprestimo').value);
-            const retorno = valor * 1.40;
-            const novoCliente = { id: Date.now(), nome: nome.toUpperCase(), valorOriginal: valor, valorRetornoBase: retorno, dataEmprestimo: tsEmp, dataVencimento: tsVenc };
+            const nomeInput = document.getElementById('nome-cliente');
+            const valorInput = document.getElementById('valor-emprestimo');
+            
+            const novoCliente = { 
+                id: Date.now(), 
+                nome: nomeInput.value.toUpperCase(), 
+                valorOriginal: parseFloat(valorInput.value), 
+                valorRetornoBase: parseFloat(valorInput.value) * 1.40, 
+                dataEmprestimo: tsEmp, 
+                dataVencimento: tsVenc 
+            };
+            
             clientes.push(novoCliente);
             localStorage.setItem('clientes_van_wallet', JSON.stringify(clientes));
-            document.getElementById('nome-cliente').value = ""; document.getElementById('valor-emprestimo').value = ""; document.getElementById('data-emprestimo').value = "";
-            document.getElementById('etapa-data-manual').style.display = 'none'; voltarParaNome(); renderizarLista();
+            
+            // RESET TOTAL DO FORMULÁRIO PARA VOLTAR AO PASSO 1
+            nomeInput.value = ""; 
+            valorInput.value = ""; 
+            document.getElementById('data-emprestimo').value = "";
+            
+            document.getElementById('etapa-data-manual').style.display = 'none';
+            document.getElementById('etapa-prazo').style.display = 'none';
+            document.getElementById('etapa-valor').style.display = 'none';
+            document.getElementById('etapa-nome').style.display = 'block';
+            document.getElementById('titulo-etapa').innerText = "NOVO REGISTRO (1/3)";
+            
+            renderizarLista();
         }
 
         function renderizarLista() {
             const lista = document.getElementById('lista-clientes');
             const displayTotal = document.getElementById('display-total');
             lista.innerHTML = ''; let totalGeral = 0;
-            if(clientes.length === 0) { lista.innerHTML = '<p style="color: #444; text-align: center; margin-top: 20px; font-size: 13px;">Nenhum cliente cadastrado.</p>'; displayTotal.innerText = "R$ 0,00"; return; }
+            
+            if(clientes.length === 0) { 
+                lista.innerHTML = '<p style="color: #444; text-align: center; margin-top: 20px;">Nenhum cliente cadastrado.</p>'; 
+                displayTotal.innerText = "R$ 0,00"; return; 
+            }
+            
             let hoje = new Date(); hoje.setHours(0,0,0,0);
 
             clientes.forEach((c) => {
-                let dataV = new Date(c.dataVencimento); dataV.setHours(0,0,0,0);
-                let dataE = new Date(c.dataEmprestimo); dataE.setHours(0,0,0,0);
+                let dataV = new Date(c.dataVencimento);
+                let dataE = new Date(c.dataEmprestimo);
                 let jurosAtraso = 0;
+                
                 if (hoje > dataV) {
-                    const diffDias = Math.ceil(Math.abs(hoje - dataV) / (1000 * 60 * 60 * 24));
+                    const diffDias = Math.floor((hoje - dataV) / (1000 * 60 * 60 * 24));
                     jurosAtraso = diffDias * MULTA_DIARIA;
                 }
+                
                 let valorFinalCobrado = c.valorRetornoBase + jurosAtraso;
                 totalGeral += valorFinalCobrado;
+                
                 let statusC = "status-em-dia"; let dot = "dot-verde";
                 if (dataV.getTime() === hoje.getTime()) { statusC = "status-vence-hoje"; dot = "dot-amarelo"; }
                 else if (hoje > dataV) { statusC = "status-vencido"; dot = "dot-vermelho"; }
@@ -187,9 +222,9 @@
                         <span style="color:#fff; font-weight:bold; font-size: 16px;">${c.nome}</span>
                         <span style="color:#d4af37; font-size: 20px; font-weight: 700;">R$ ${valorFinalCobrado.toLocaleString('pt-br', {minimumFractionDigits: 2})}</span>
                     </div>
-                    <div style="font-size: 11px; color: #888; line-height: 1.6;">
-                        <div><span class="dot ${dot}"></span>Emprestado em: ${dataE.toLocaleDateString('pt-br')}</div>
-                        <div style="display: flex; justify-content: space-between; color: #444; margin-top: 5px;">
+                    <div style="font-size: 11px; color: #888;">
+                        <div><span class="dot ${dot}"></span>Emprestado: ${dataE.toLocaleDateString('pt-br')}</div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 8px; color: #555;">
                             <span>Inv.: R$ ${c.valorOriginal.toFixed(2)}</span>
                             ${jurosAtraso > 0 ? `<span style="color: #e74c3c;">Juros Venc.: R$ ${jurosAtraso.toFixed(2)}</span>` : ''}
                         </div>
