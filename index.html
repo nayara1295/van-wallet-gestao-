@@ -5,23 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Van Wallet - Private Banking</title>
     <style>
-        /* RECUPERANDO O VISUAL PRETO E DOURADO */
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #e0e0e0; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #e0e0e0; overflow-x: hidden; }
         
         #tela-login { 
             position: fixed; width: 100%; height: 100%; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: #000; z-index: 1000; text-align: center; 
+            background: #000; z-index: 10000; text-align: center; 
         }
 
         .logo-svg { width: 80px; height: 80px; margin-bottom: 20px; }
-        
         h1 { font-size: 22px; letter-spacing: 3px; color: #fff; margin: 0; font-weight: 300; }
         
         #campo-senha-login { 
-            padding: 18px; width: 250px; font-size: 22px; text-align: center; 
-            border-radius: 12px; border: 1px solid #222; background: #080808; 
-            color: #d4af37; margin: 30px 0 15px; letter-spacing: 10px; outline: none; 
+            padding: 18px; width: 250px; font-size: 24px; text-align: center; 
+            border-radius: 12px; border: 1px solid #333; background: #0a0a0a; 
+            color: #d4af37; margin: 30px 0 15px; letter-spacing: 8px; outline: none; 
         }
 
         .btn-acessar { 
@@ -31,7 +29,6 @@
 
         #conteudo-privado { display: none; padding: 20px; max-width: 500px; margin: 0 auto; }
         
-        /* ESTILO DOS CARDS */
         .card-topo { 
             background: linear-gradient(145deg, #0f0f0f, #050505); 
             padding: 20px; border-radius: 20px; border: 1px solid #1a1a1a; 
@@ -46,22 +43,12 @@
         .status-vencido { border-left: 6px solid #e74c3c; }
         
         .container-botoes { display: flex; gap: 10px; margin-top: 15px; }
-        .mini-card { 
-            flex: 1; padding: 12px; border-radius: 12px; text-align: center; 
-            font-size: 12px; font-weight: bold; cursor: pointer; 
-            text-transform: uppercase; border: 1px solid #333; 
-        }
+        .mini-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; border: 1px solid #333; }
         .btn-pago { background: #1b4d2e; color: #2ecc71; border: 1px solid #2ecc7133; }
         .btn-inf { background: #1a1a1a; color: #d4af37; border: 1px solid #d4af3733; }
 
-        .input-step { 
-            width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #222; 
-            background: #080808; color: #fff; font-size: 16px; outline: none; box-sizing: border-box; 
-        }
-        .btn-prazo { 
-            flex: 1; padding: 20px; background: #111; color: #d4af37; 
-            border: 1px solid #333; border-radius: 15px; font-size: 18px; font-weight: 700; 
-        }
+        .input-step { width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #222; background: #080808; color: #fff; font-size: 16px; outline: none; box-sizing: border-box; }
+        .btn-prazo { flex: 1; padding: 20px; background: #111; color: #d4af37; border: 1px solid #333; border-radius: 15px; font-size: 18px; font-weight: 700; }
         .dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .dot-verde { background: #2ecc71; }
         .dot-amarelo { background: #f1c40f; }
@@ -78,21 +65,20 @@
             </svg>
         </div>
         <h1>VAN WALLET</h1>
-        <input type="password" id="campo-senha-login" placeholder="••••••" maxlength="6">
+        <input type="password" id="campo-senha-login" placeholder="••••••" maxlength="6" inputmode="numeric">
         <button class="btn-acessar" onclick="fazerLogin()">CONECTAR</button>
-        <p id="msg-erro" style="color: #ff4d4d; font-size: 12px; margin-top: 15px;"></p>
+        <p id="msg-erro" style="color: #ff4d4d; font-size: 12px; margin-top: 15px; height: 20px;"></p>
     </div>
 
     <div id="conteudo-privado">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <span style="color: #d4af37; font-weight: 600; font-size: 12px;">PRIVATE BANKING</span>
-            <button onclick="logout()" style="background:none; border:none; color:#666; cursor:pointer;">Sair</button>
+            <button onclick="logout()" style="background:none; border:none; color:#666; cursor:pointer; font-size: 12px;">Sair</button>
         </div>
 
         <div class="card-topo">
             <div class="label">Dinheiro na Rua</div>
             <div class="valor-principal" id="display-total">R$ 0,00</div>
-            <div style="color: #d4af37; font-size: 13px;">↑ Juros de Atraso (R$ 40/dia) incluídos</div>
         </div>
 
         <div class="card-topo" id="card-cadastro" style="border-style: dashed; border-color: #333;">
@@ -133,8 +119,13 @@
         const MULTA_DIARIA = 40.00;
         let clientes = JSON.parse(localStorage.getItem('clientes_van_wallet')) || [];
 
+        // Detectar tecla Enter no Login
+        document.getElementById('campo-senha-login').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { fazerLogin(); }
+        });
+
         window.onload = function() {
-            if(sessionStorage.getItem('logado') === 'true') {
+            if(sessionStorage.getItem('van_logado') === 'true') {
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('conteudo-privado').style.display = 'block';
                 renderizarLista();
@@ -142,17 +133,19 @@
         };
 
         function fazerLogin() {
-            if (document.getElementById('campo-senha-login').value === SENHA_MESTRE) {
-                sessionStorage.setItem('logado', 'true');
+            const senhaInserida = document.getElementById('campo-senha-login').value;
+            if (senhaInserida === SENHA_MESTRE) {
+                sessionStorage.setItem('van_logado', 'true');
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('conteudo-privado').style.display = 'block';
                 renderizarLista();
             } else {
-                document.getElementById('msg-erro').innerText = "PIN INCORRETO";
+                document.getElementById('msg-erro').innerText = "PIN INCORRETO. TENTE NOVAMENTE.";
+                document.getElementById('campo-senha-login').value = "";
             }
         }
 
-        function logout() { sessionStorage.removeItem('logado'); location.reload(); }
+        function logout() { sessionStorage.clear(); location.reload(); }
         function irParaValor() { if(document.getElementById('nome-cliente').value) { document.getElementById('etapa-nome').style.display='none'; document.getElementById('etapa-valor').style.display='block'; } }
         function irParaPrazo() { if(document.getElementById('valor-emprestimo').value) { document.getElementById('etapa-valor').style.display='none'; document.getElementById('etapa-prazo').style.display='block'; } }
         function abrirDataManual() { document.getElementById('etapa-prazo').style.display='none'; document.getElementById('etapa-data-manual').style.display='block'; }
@@ -224,4 +217,18 @@
             let c = clientes.find(x => x.id === id);
             let dE = new Date(c.dataEmprestimo);
             let dV = new Date(c.dataVencimento);
-            let diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "S
+            let diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+            alert("ℹ️ INFOS GERAIS\n\nCLIENTE: " + c.nome + "\nINVESTIDO: R$ " + c.valorOriginal.toFixed(2) + "\n\nDATA EMPRÉSTIMO:\n" + dE.toLocaleDateString('pt-br') + " (" + diasSemana[dE.getDay()] + ")\nHora: " + dE.getHours().toString().padStart(2, '0') + ":" + dE.getMinutes().toString().padStart(2, '0') + "\n\nVENCIMENTO:\n" + dV.toLocaleDateString('pt-br') + " (" + diasSemana[dV.getDay()] + ")");
+        }
+
+        function confirmarPagamento(id) {
+            let senha = prompt("Digite a sua senha:");
+            if (senha === SENHA_MESTRE) {
+                clientes = clientes.filter(c => c.id !== id);
+                localStorage.setItem('clientes_van_wallet', JSON.stringify(clientes));
+                renderizarLista();
+            } else if (senha !== null) { alert("Senha incorreta!"); }
+        }
+    </script>
+</body>
+</html>
