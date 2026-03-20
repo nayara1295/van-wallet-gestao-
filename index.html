@@ -5,28 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Van Wallet - Private Banking</title>
     <style>
+        /* RECUPERANDO O VISUAL PRETO E DOURADO */
         body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #e0e0e0; }
-        #tela-login { position: fixed; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 1000; text-align: center; }
-        h1 { font-size: 22px; letter-spacing: 3px; color: #fff; margin: 0; }
-        #campo-senha { padding: 18px; width: 250px; font-size: 22px; text-align: center; border-radius: 12px; border: 1px solid #222; background: #080808; color: #d4af37; margin: 30px 0 15px; outline: none; }
-        .btn-acessar { padding: 16px; width: 250px; background: #fff; color: #000; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+        
+        #tela-login { 
+            position: fixed; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: #000; z-index: 1000; text-align: center; 
+        }
+
+        .logo-svg { width: 80px; height: 80px; margin-bottom: 20px; }
+        
+        h1 { font-size: 22px; letter-spacing: 3px; color: #fff; margin: 0; font-weight: 300; }
+        
+        #campo-senha-login { 
+            padding: 18px; width: 250px; font-size: 22px; text-align: center; 
+            border-radius: 12px; border: 1px solid #222; background: #080808; 
+            color: #d4af37; margin: 30px 0 15px; letter-spacing: 10px; outline: none; 
+        }
+
+        .btn-acessar { 
+            padding: 16px; width: 250px; background: #fff; color: #000; 
+            border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; 
+        }
+
         #conteudo-privado { display: none; padding: 20px; max-width: 500px; margin: 0 auto; }
-        .card-topo { background: linear-gradient(145deg, #0f0f0f, #050505); padding: 20px; border-radius: 20px; border: 1px solid #1a1a1a; margin-top: 20px; position: relative; }
+        
+        /* ESTILO DOS CARDS */
+        .card-topo { 
+            background: linear-gradient(145deg, #0f0f0f, #050505); 
+            padding: 20px; border-radius: 20px; border: 1px solid #1a1a1a; 
+            margin-top: 20px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
         .label { color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; }
         .valor-principal { font-size: 32px; font-weight: 700; color: #fff; margin: 10px 0; }
+        
         .status-em-dia { border-left: 6px solid #2ecc71; }
         .status-vence-hoje { border-left: 6px solid #f1c40f; }
         .status-vencido { border-left: 6px solid #e74c3c; }
         
-        /* MINI CARDS / BOTÕES */
         .container-botoes { display: flex; gap: 10px; margin-top: 15px; }
-        .mini-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; border: 1px solid #333; transition: 0.3s; }
+        .mini-card { 
+            flex: 1; padding: 12px; border-radius: 12px; text-align: center; 
+            font-size: 12px; font-weight: bold; cursor: pointer; 
+            text-transform: uppercase; border: 1px solid #333; 
+        }
         .btn-pago { background: #1b4d2e; color: #2ecc71; border: 1px solid #2ecc7133; }
-        .btn-pago:active { background: #2ecc71; color: #000; }
         .btn-inf { background: #1a1a1a; color: #d4af37; border: 1px solid #d4af3733; }
 
-        .input-step { width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #222; background: #080808; color: #fff; font-size: 16px; outline: none; box-sizing: border-box; }
-        .btn-prazo { flex: 1; padding: 20px; background: #111; color: #d4af37; border: 1px solid #333; border-radius: 15px; font-size: 18px; font-weight: 700; }
+        .input-step { 
+            width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #222; 
+            background: #080808; color: #fff; font-size: 16px; outline: none; box-sizing: border-box; 
+        }
+        .btn-prazo { 
+            flex: 1; padding: 20px; background: #111; color: #d4af37; 
+            border: 1px solid #333; border-radius: 15px; font-size: 18px; font-weight: 700; 
+        }
         .dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .dot-verde { background: #2ecc71; }
         .dot-amarelo { background: #f1c40f; }
@@ -36,25 +71,41 @@
 <body>
 
     <div id="tela-login">
+        <div class="logo-svg">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 85L20 50H35V15H65V50H80L50 85Z" stroke="#d4af37" stroke-width="4" stroke-linejoin="round"/>
+                <circle cx="50" cy="50" r="10" stroke="#d4af37" stroke-width="3" />
+            </svg>
+        </div>
         <h1>VAN WALLET</h1>
         <input type="password" id="campo-senha-login" placeholder="••••••" maxlength="6">
         <button class="btn-acessar" onclick="fazerLogin()">CONECTAR</button>
+        <p id="msg-erro" style="color: #ff4d4d; font-size: 12px; margin-top: 15px;"></p>
     </div>
 
     <div id="conteudo-privado">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="color: #d4af37; font-weight: 600; font-size: 12px;">PRIVATE BANKING</span>
+            <button onclick="logout()" style="background:none; border:none; color:#666; cursor:pointer;">Sair</button>
+        </div>
+
         <div class="card-topo">
             <div class="label">Dinheiro na Rua</div>
             <div class="valor-principal" id="display-total">R$ 0,00</div>
+            <div style="color: #d4af37; font-size: 13px;">↑ Juros de Atraso (R$ 40/dia) incluídos</div>
         </div>
 
         <div class="card-topo" id="card-cadastro" style="border-style: dashed; border-color: #333;">
             <div id="etapa-nome">
                 <input type="text" id="nome-cliente" class="input-step" placeholder="Nome do Cliente">
-                <button class="btn-acessar" style="width: 100%; margin-top: 15px; background: #d4af37;" onclick="irParaValor()">AVANÇAR</button>
+                <button class="btn-acessar" style="width: 100%; margin-top: 15px; background: #d4af37; color: #000;" onclick="irParaValor()">AVANÇAR</button>
             </div>
             <div id="etapa-valor" style="display: none;">
-                <input type="number" id="valor-emprestimo" class="input-step" placeholder="Valor R$">
-                <button class="btn-acessar" style="width: 100%; margin-top: 15px;" onclick="irParaPrazo()">AVANÇAR</button>
+                <input type="number" id="valor-emprestimo" class="input-step" placeholder="Valor R$" style="text-align: center; color: #d4af37; font-size: 22px;">
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button onclick="location.reload()" style="flex: 1; background: none; border: 1px solid #333; color: #666; border-radius: 12px;">Voltar</button>
+                    <button class="btn-acessar" style="flex: 2;" onclick="irParaPrazo()">AVANÇAR</button>
+                </div>
             </div>
             <div id="etapa-prazo" style="display: none;">
                 <div style="display: flex; gap: 10px;">
@@ -62,7 +113,7 @@
                     <button class="btn-prazo" onclick="finalizarComPrazo(15)">15D</button>
                     <button class="btn-prazo" onclick="finalizarComPrazo(30)">30D</button>
                 </div>
-                <button onclick="abrirDataManual()" style="width:100%; background:none; border:none; color:#555; margin-top:10px; font-size:10px;">DATA ANTIGA</button>
+                <button onclick="abrirDataManual()" style="width:100%; background:none; border:none; color:#555; margin-top:15px; font-size:10px; font-weight: bold;">LANÇAR DATA ANTIGA</button>
             </div>
             <div id="etapa-data-manual" style="display: none;">
                 <input type="date" id="data-emprestimo" class="input-step">
@@ -82,6 +133,14 @@
         const MULTA_DIARIA = 40.00;
         let clientes = JSON.parse(localStorage.getItem('clientes_van_wallet')) || [];
 
+        window.onload = function() {
+            if(sessionStorage.getItem('logado') === 'true') {
+                document.getElementById('tela-login').style.display = 'none';
+                document.getElementById('conteudo-privado').style.display = 'block';
+                renderizarLista();
+            }
+        };
+
         function fazerLogin() {
             if (document.getElementById('campo-senha-login').value === SENHA_MESTRE) {
                 sessionStorage.setItem('logado', 'true');
@@ -89,12 +148,13 @@
                 document.getElementById('conteudo-privado').style.display = 'block';
                 renderizarLista();
             } else {
-                alert("Senha de acesso incorreta!");
+                document.getElementById('msg-erro').innerText = "PIN INCORRETO";
             }
         }
 
-        function irParaValor() { document.getElementById('etapa-nome').style.display='none'; document.getElementById('etapa-valor').style.display='block'; }
-        function irParaPrazo() { document.getElementById('etapa-valor').style.display='none'; document.getElementById('etapa-prazo').style.display='block'; }
+        function logout() { sessionStorage.removeItem('logado'); location.reload(); }
+        function irParaValor() { if(document.getElementById('nome-cliente').value) { document.getElementById('etapa-nome').style.display='none'; document.getElementById('etapa-valor').style.display='block'; } }
+        function irParaPrazo() { if(document.getElementById('valor-emprestimo').value) { document.getElementById('etapa-valor').style.display='none'; document.getElementById('etapa-prazo').style.display='block'; } }
         function abrirDataManual() { document.getElementById('etapa-prazo').style.display='none'; document.getElementById('etapa-data-manual').style.display='block'; }
 
         function finalizarComPrazo(dias) {
@@ -106,8 +166,8 @@
         function finalizarComDataEIntervalo(dias) {
             let input = document.getElementById('data-emprestimo').value;
             if(!input) return alert("Selecione a data!");
-            let partes = input.split('-');
-            let emp = new Date(partes[0], partes[1]-1, partes[2], 12, 0, 0);
+            let p = input.split('-');
+            let emp = new Date(p[0], p[1]-1, p[2], 12, 0, 0);
             let venc = new Date(emp); venc.setDate(emp.getDate() + dias);
             salvar(emp.getTime(), venc.getTime());
         }
@@ -115,8 +175,6 @@
         function salvar(tsEmp, tsVenc) {
             let n = document.getElementById('nome-cliente').value;
             let v = parseFloat(document.getElementById('valor-emprestimo').value);
-            if(!n || !v) return alert("Preencha os dados!");
-            
             clientes.push({ id: Date.now(), nome: n.toUpperCase(), valorOriginal: v, valorRetornoBase: v * 1.40, dataEmprestimo: tsEmp, dataVencimento: tsVenc });
             localStorage.setItem('clientes_van_wallet', JSON.stringify(clientes));
             location.reload();
@@ -152,7 +210,6 @@
                         <div style="margin-top:8px; font-size:11px; color:#666;">
                             <span class="dot ${pto}"></span> Emprestado: ${dEmp.toLocaleDateString('pt-br')}
                         </div>
-                        
                         <div class="container-botoes">
                             <div class="mini-card btn-pago" onclick="confirmarPagamento(${c.id})">PAGO</div>
                             <div class="mini-card btn-inf" onclick="verInfo(${c.id})">INF</div>
@@ -167,34 +224,4 @@
             let c = clientes.find(x => x.id === id);
             let dE = new Date(c.dataEmprestimo);
             let dV = new Date(c.dataVencimento);
-            let diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-            
-            alert(
-                "ℹ️ DETALHES DO EMPRÉSTIMO\n\n" +
-                "👤 Cliente: " + c.nome + "\n" +
-                "💰 Valor Emprestado: R$ " + c.valorOriginal.toFixed(2) + "\n" +
-                "📈 Retorno Combinado: R$ " + c.valorRetornoBase.toFixed(2) + "\n\n" +
-                "🗓️ DATA DO EMPRÉSTIMO:\n" +
-                dE.toLocaleDateString('pt-br') + " (" + diasSemana[dE.getDay()] + ")\n" +
-                "⏰ Hora: " + dE.getHours().toString().padStart(2, '0') + ":" + dE.getMinutes().toString().padStart(2, '0') + "\n\n" +
-                "🏁 DATA DO VENCIMENTO:\n" +
-                dV.toLocaleDateString('pt-br') + " (" + diasSemana[dV.getDay()] + ")"
-            );
-        }
-
-        // FUNÇÃO DE SEGURANÇA COM SENHA
-        function confirmarPagamento(id) {
-            let senha = prompt("CONFIRMAÇÃO DE PAGAMENTO\nPara apagar este registro, digite sua senha de acesso:");
-            
-            if (senha === SENHA_MESTRE) {
-                clientes = clientes.filter(c => c.id !== id);
-                localStorage.setItem('clientes_van_wallet', JSON.stringify(clientes));
-                renderizarLista();
-                alert("Pagamento confirmado e registro removido!");
-            } else if (senha !== null) {
-                alert("SENHA INCORRETA! O registro não foi alterado.");
-            }
-        }
-    </script>
-</body>
-</html>
+            let diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "S
