@@ -3,143 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carteira Pessoal Vanubia</title>
+    <title>VANUBIA CORE - Acesso Seguro</title>
     <style>
-        /* --- ESTILO BASE PREMIUM --- */
+        /* --- ESTILO BASE & FUNDO FUTURISTA (CIRCUITOS MOVIMENTADOS) --- */
         body, html {
             height: 100%;
             margin: 0;
-            font-family: 'Times New Roman', Times, serif; /* Fonte mais clássica e elegante */
-            background-color: #000; /* Fundo preto absoluto */
-            background-image: radial-gradient(circle, #1a1a1a 0%, #000000 70%); /* Brilho central suave */
+            font-family: 'Orbitron', sans-serif; /* Fonte futurista */
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #d4af37; /* Dourado suave para textos gerais */
+            color: #d4af37; /* Dourado */
             overflow: hidden;
+            background-image: 
+                radial-gradient(circle at center, #1a1a1a 0%, #000000 80%),
+                url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM0NDQiIGZpbGwtb3BhY2l0eT0iMC4xNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgwVjB6bTIwIDIwaDIwdjIwSDIWMjB6TTAgMjBoMjB2MjBIMFYyMHoyMCAwaDIwdjIwSDIwVjB6Ii8+PC9nPjwvZz48L3N2Zz4='); /* Fundo sutil de grid */
         }
 
-        /* --- CONTAINER DE LOGIN ELEGANTE --- */
+        /* Animação do fundo de circuitos */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAwIiBoZWlnaHQ9IjEwMDAiIHZpZXdCb3g9IjAgMCAxMDAwIDEwMDAiPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Q0YWYzNyIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIwLjUiPjxwYXRoIGQ9Ik0xMCAxMGgxMDB2MTAwSDEweiBNMTEwIDExMGgxMDB2MTAwSDExMHogTTIxMCAyMTBoMTAwdjEwMEgyMTB6IE0zMTAgMzEwaDEwMHYxMDBIMzEweiBNNDEwIDQxMGgxMDB2MTAwSDQxMHogTTUxMCA1MTBoMTAwdjEwMEg1MTB6IE02MTAgNjEwaDEwMHYxMDBINjEweiBNNzEwIDcxMGgxMDB2MTAwSDcxMHogTTgxMCA4MTBoMTAwdjEwMEg4MTB6IE05MTAgOTEwaDEwMHYxMDBIOTEweiIvPjwvZz48L3N2Zz4=') repeat;
+            opacity: 0.2;
+            animation: moveBackground 60s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: 1000px 1000px; }
+        }
+
+        /* --- CONTAINER PRINCIPAL (COFRE DIGITAL) --- */
         .login-container {
-            background: rgba(10, 10, 10, 0.9); /* Fundo escuro quase opaco */
-            padding: 50px 40px;
-            border-radius: 4px; /* Bordas menos arredondadas, mais sóbrias */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Sombra profunda */
-            border: 1px solid #aa8528; /* Borda dourada fina e envelhecida */
-            width: 320px;
+            background-color: rgba(10, 10, 10, 0.95);
+            padding: 60px 50px;
+            border-radius: 5px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 100px rgba(212, 175, 55, 0.1);
+            border: 2px solid #d4af37; /* Borda dourada grossa */
+            width: 380px;
             text-align: center;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); /* Animação suave */
-            opacity: 0; /* Começa invisível para o efeito de entrada */
-            transform: translateY(20px);
-        }
-        
-        /* Classe para mostrar o container com animação ao carregar a página */
-        .login-container.carregado {
-            opacity: 1;
-            transform: translateY(0);
+            position: relative;
+            animation: revealContainer 1s ease-out;
         }
 
-        /* --- LOGO DOURADA PRESTÍGIO --- */
+        /* Detalhes de 'Canto' Futuristas nas bordas */
+        .login-container::after {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; width: 30px; height: 30px;
+            border-top: 5px solid #d4af37; border-left: 5px solid #d4af37;
+        }
+        .login-container::before {
+            content: '';
+            position: absolute;
+            bottom: -5px; right: -5px; width: 30px; height: 30px;
+            border-bottom: 5px solid #d4af37; border-right: 5px solid #d4af37;
+        }
+
+        @keyframes revealContainer {
+            0% { opacity: 0; transform: scale(0.8) translateY(-50px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* --- LOGO "VANUBIA CORE" (NEON DOURADO GEOMÉTRICO) --- */
         .logo {
-            font-size: 32px;
-            font-weight: 300; /* Mais fina para elegância */
+            font-size: 38px;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 4px; /* Espaçamento chique */
-            margin-bottom: 40px;
-            color: #d4af37; /* Dourado metálico */
-            /* Brilho sofisticado, não neon */
-            text-shadow: 0px 2px 4px rgba(170, 133, 40, 0.5); 
+            letter-spacing: 6px;
+            margin-bottom: 50px;
+            color: #d4af37;
+            text-shadow: 0 0 10px #d4af37, 0 0 20px #ff4500, 0 0 40px #d4af37;
+            animation: pulseNeon 3s infinite;
         }
 
-        /* --- ESTILO DO CAMPO DE SENHA --- */
+        .sub-logo {
+            font-size: 14px;
+            color: #aa8528;
+            letter-spacing: 3px;
+            font-weight: 400;
+            display: block;
+            margin-top: -10px;
+        }
+
+        @keyframes pulseNeon {
+            0%, 100% { text-shadow: 0 0 10px #d4af37, 0 0 20px #ff4500, 0 0 40px #d4af37; }
+            50% { text-shadow: 0 0 5px #d4af37, 0 0 10px #ff4500, 0 0 20px #d4af37; }
+        }
+
+        /* --- CAMPO DE SENHA (INTERFACE DE COFRE) --- */
         .input-group {
-            margin-bottom: 25px;
-            text-align: center; /* Centralizar label e input */
-        }
-        
-        /* Label 'Senha Pessoal' */
-        .input-group label { 
-            display: block; 
-            margin-bottom: 10px; 
-            color: #aa8528; 
-            font-size: 14px; 
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        /* Campo de Input */
-        .input-group input {
-            width: 80%; /* Não ocupa tudo, fica mais centralizado */
-            padding: 15px; 
-            background-color: #0a0a0a;
-            border: none;
-            border-bottom: 1px solid #444; /* Apenas linha inferior para visual limpo */
-            color: #fff; 
-            font-size: 20px; /* Senha maior */
-            text-align: center; /* Centralizar os pontos da senha */
-            letter-spacing: 5px; /* Espaçamento nos pontos da senha */
-            box-sizing: border-box; 
-            transition: all 0.3s ease;
-        }
-        
-        /* Efeito ao clicar: a linha fica dourada */
-        .input-group input:focus { 
-            outline: none; 
-            border-bottom: 1px solid #d4af37;
+            margin-bottom: 35px;
+            text-align: center;
+            position: relative;
         }
 
-        /* --- ESTILO DO BOTÃO ACESSAR --- */
-        .btn-gold {
-            width: 80%; 
-            padding: 15px;
-            background: none; /* Sem fundo colorido */
-            border: 1px solid #d4af37; /* Borda dourada */
-            color: #d4af37; 
-            border-radius: 2px;
-            font-size: 16px; 
-            font-weight: 300; 
-            cursor: pointer;
-            transition: all 0.4s ease; 
+        .input-group label {
+            display: block;
+            margin-bottom: 15px;
+            color: #ff4500; /* Laranja de aviso */
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 3px;
+            font-weight: bold;
         }
-        
-        /* Efeito ao passar o mouse: preenche com dourado */
-        .btn-gold:hover { 
+
+        /* Campo Input (Cofre Digital) */
+        .input-group input {
+            width: 80%;
+            padding: 18px 25px;
+            background-color: #000;
+            border: 2px solid #d4af37;
+            color: #fff;
+            font-size: 26px; /* Senha grande */
+            text-align: center;
+            letter-spacing: 15px; /* Muito espaçamento */
+            border-radius: 0; /* Quadrado */
+            font-family: 'Courier New', Courier, monospace; /* Fonte de máquina */
+            box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Símbolos futuristas para esconder a senha (em vez de bolinhas) */
+        .input-group input[type="password"] {
+            -webkit-text-security: disc; /* Padrão, mas vamos forçar a fonte Courier */
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #ff4500;
+            box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);
+        }
+
+        /* --- BOTÃO "ATIVAR" (INTERFACE DE ATIVAÇÃO) --- */
+        .btn-gold {
+            width: 80%;
+            padding: 18px;
+            background: none;
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        /* Linha de "Efeito de Scan" no botão */
+        .btn-gold::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+            transition: all 0.4s ease;
+        }
+
+        .btn-gold:hover {
             background-color: #d4af37;
             color: #000;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-gold:hover::before {
+            left: 100%;
+        }
+
+        /* --- INTERFACE AUXILIAR --- */
+        .status-bar {
+            margin-top: 40px;
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="login-container" id="containerPrincipal">
         <div class="logo">
-            Vanubia<br>
-            <span style="font-size: 16px; letter-spacing: 2px; color: #aa8528;">Carteira Pessoal</span>
+            VANUBIA
+            <span class="sub-logo">CORE SYSTEM</span>
         </div>
 
         <form id="loginForm" action="#" method="post" onsubmit="verificarSenha(event)">
             
             <div class="input-group">
-                <label for="senha">Senha de Acesso</label>
-                <input type="password" id="senha" name="senha" placeholder="••••" required maxlength="4">
+                <label for="senha">AUTENTICAÇÃO EXIGIDA</label>
+                <input type="password" id="senha" name="senha" placeholder="____" required maxlength="4" autofocus>
             </div>
 
-            <button type="submit" class="btn-gold">Acessar</button>
+            <button type="submit" class="btn-gold">ATIVAR</button>
         </form>
+        
+        <div class="status-bar">
+            SYSTEM STATUS: ONLINE | SECURITY LEVEL: MAXIMUM
+        </div>
 
     </div>
 
     <script>
-        // Animação de entrada ao carregar a página
-        window.onload = function() {
-            document.getElementById('containerPrincipal').classList.add('carregado');
-            document.getElementById('senha').focus(); // Já foca no campo de senha
-        }
-
         // ITEM: VALIDAÇÃO DA SENHA DEFINIDA (9656)
         function verificarSenha(event) {
             event.preventDefault(); // Impede o formulário de recarregar a página
@@ -148,40 +220,34 @@
             const SENHA_CORRETA = "9656"; // Sua senha definida
 
             if (senhaDigitada === SENHA_CORRETA) {
-                // Efeito simples de sucesso antes de entrar
+                // Efeito de sucesso futurista (tudo verde)
                 document.getElementById('containerPrincipal').style.borderColor = "#00ff00";
-                document.getElementById('containerPrincipal').style.boxShadow = "0 0 20px rgba(0, 255, 0, 0.3)";
+                document.getElementById('containerPrincipal').style.boxShadow = "0 0 50px rgba(0, 255, 0, 0.4)";
+                document.querySelector('.logo').style.color = "#00ff00";
+                document.querySelector('.logo').style.textShadow = "0 0 10px #00ff00";
                 
                 setTimeout(() => {
-                    alert("Acesso Autorizado. Bem-vinda!");
+                    alert("ACESSO CONFIRMADO. BEM-VINDA, VANUBIA.");
                     // Próximo passo: Redirecionar para a tela de empréstimos
                 }, 500);
 
             } else {
-                // Efeito de erro (piscar vermelho)
+                // Efeito de erro futurista (tudo vermelho e vibração)
                 const container = document.getElementById('containerPrincipal');
                 container.style.borderColor = "#ff0000";
-                container.style.boxShadow = "0 0 20px rgba(255, 0, 0, 0.3)";
+                container.style.boxShadow = "0 0 50px rgba(255, 0, 0, 0.4)";
+                document.querySelector('.input-group label').style.color = "#ff0000";
                 
-                alert("Senha Incorreta.");
+                alert("ACESSO NEGADO. SENHA INCORRETA.");
                 
                 // Reseta a cor após o alerta
                 setTimeout(() => {
-                    container.style.borderColor = "#aa8528";
-                    container.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.8)";
+                    container.style.borderColor = "#d4af37";
+                    container.style.boxShadow = "0 0 40px rgba(0, 0, 0, 0.8)";
+                    document.querySelector('.input-group label').style.color = "#ff4500";
                     document.getElementById('senha').value = ''; 
                     document.getElementById('senha').focus();
                 }, 200);
-            }
-        }
-    </script>
-
-</body>
-</html>
-            } else {
-                alert("Senha Incorreta. Tente novamente.");
-                document.getElementById('senha').value = ''; // Limpa o campo
-                document.getElementById('senha').focus(); // Coloca o cursor de volta
             }
         }
     </script>
