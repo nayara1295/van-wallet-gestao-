@@ -78,15 +78,21 @@
                     <button class="btn-prazo" onclick="finalizarComPrazo(15)">15</button>
                     <button class="btn-prazo" onclick="finalizarComPrazo(30)">30</button>
                 </div>
-                <button class="btn-outro" onclick="abrirDataManual()">OUTRO (DATA MANUAL)</button>
+                <button class="btn-outro" onclick="abrirDataManual()">OUTRO (LANÇAR ANTIGO)</button>
                 <button onclick="voltarParaValor()" style="width: 100%; background: none; border: none; color: #444; margin-top: 20px; cursor: pointer; font-size: 11px;">← Corrigir Valor</button>
             </div>
 
             <div id="etapa-data-manual" style="display: none;">
-                <div class="label" style="text-align: center; margin-bottom: 15px;">Data de Vencimento do Cliente</div>
-                <input type="date" id="data-retroativa" class="input-step" style="text-align: center; color: #d4af37;">
-                <button class="btn-acessar" style="width: 100%; margin-top: 20px; background: #2ecc71; color: #000;" onclick="finalizarDataManual()">CADASTRAR JÁ EXISTENTE</button>
-                <button onclick="voltarParaPrazo()" style="width: 100%; background: none; border: none; color: #444; margin-top: 15px; cursor: pointer; font-size: 11px;">Voltar aos prazos fixos</button>
+                <div class="label" style="text-align: center; margin-bottom: 15px;">Quando foi feito o empréstimo?</div>
+                <input type="date" id="data-emprestimo" class="input-step" style="text-align: center; color: #d4af37; margin-bottom: 15px;">
+                
+                <div class="label" style="text-align: center; margin-bottom: 15px;">Qual foi o prazo combinado?</div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-prazo" style="padding: 15px; font-size: 14px;" onclick="finalizarComDataEIntervalo(7)">7 DIAS</button>
+                    <button class="btn-prazo" style="padding: 15px; font-size: 14px;" onclick="finalizarComDataEIntervalo(15)">15 DIAS</button>
+                    <button class="btn-prazo" style="padding: 15px; font-size: 14px;" onclick="finalizarComDataEIntervalo(30)">30 DIAS</button>
+                </div>
+                <button onclick="voltarParaPrazo()" style="width: 100%; background: none; border: none; color: #444; margin-top: 20px; cursor: pointer; font-size: 11px;">Voltar</button>
             </div>
         </div>
 
@@ -119,7 +125,6 @@
         }
 
         function logout() { sessionStorage.removeItem('logado'); location.reload(); }
-
         function irParaValor() { if(!document.getElementById('nome-cliente').value) return; document.getElementById('etapa-nome').style.display = 'none'; document.getElementById('etapa-valor').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "VALOR DO EMPRÉSTIMO (2/3)"; }
         function voltarParaNome() { document.getElementById('etapa-valor').style.display = 'none'; document.getElementById('etapa-nome').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "NOVO REGISTRO (1/3)"; }
         function irParaPrazo() { if(!document.getElementById('valor-emprestimo').value) return; document.getElementById('etapa-valor').style.display = 'none'; document.getElementById('etapa-prazo').style.display = 'block'; document.getElementById('titulo-etapa').innerText = "PRAZO DE PAGAMENTO (3/3)"; }
@@ -128,7 +133,7 @@
         function abrirDataManual() {
             document.getElementById('etapa-prazo').style.display = 'none';
             document.getElementById('etapa-data-manual').style.display = 'block';
-            document.getElementById('titulo-etapa').innerText = "DATA DE VENCIMENTO MANUAL";
+            document.getElementById('titulo-etapa').innerText = "LANÇAR EMPRÉSTIMO ANTIGO";
         }
 
         function voltarParaPrazo() {
@@ -137,6 +142,7 @@
             document.getElementById('titulo-etapa').innerText = "PRAZO DE PAGAMENTO (3/3)";
         }
 
+        // Finaliza para empréstimos feitos HOJE
         function finalizarComPrazo(dias) {
             let dataV = new Date();
             dataV.setHours(0,0,0,0);
@@ -144,11 +150,15 @@
             salvarCliente(dataV.getTime());
         }
 
-        function finalizarDataManual() {
-            const dataInput = document.getElementById('data-retroativa').value;
-            if(!dataInput) return alert("Selecione a data do vencimento!");
-            let dataV = new Date(dataInput);
-            dataV.setHours(24,0,0,0); // Ajuste para fuso horário local
+        // Finaliza calculando a partir de uma DATA PASSADA
+        function finalizarComDataEIntervalo(dias) {
+            const dataEmprestimoVal = document.getElementById('data-emprestimo').value;
+            if(!dataEmprestimoVal) return alert("Selecione a data em que você emprestou!");
+            
+            let dataV = new Date(dataEmprestimoVal);
+            dataV.setHours(24,0,0,0); // Ajuste fuso
+            dataV.setDate(dataV.getDate() + dias); // Soma o prazo à data do empréstimo
+            
             salvarCliente(dataV.getTime());
         }
 
@@ -168,10 +178,9 @@
             clientes.push(novoCliente);
             localStorage.setItem('clientes_van_wallet', JSON.stringify(clientes));
             
-            // Reset Total
             document.getElementById('nome-cliente').value = "";
             document.getElementById('valor-emprestimo').value = "";
-            document.getElementById('data-retroativa').value = "";
+            document.getElementById('data-emprestimo').value = "";
             document.getElementById('etapa-data-manual').style.display = 'none';
             voltarParaNome();
             renderizarLista();
@@ -203,37 +212,4 @@
                 totalGeralComJuros += valorFinalCobrado;
 
                 let statusC = "status-em-dia"; let statusT = "Em dia"; let dot = "dot-verde";
-                if (dataV.getTime() === hoje.getTime()) { statusC = "status-vence-hoje"; statusT = "Vence Hoje"; dot = "dot-amarelo"; }
-                else if (hoje > dataV) { statusC = "status-vencido"; statusT = "Vencido"; dot = "dot-vermelho"; }
-
-                const item = document.createElement('div');
-                item.className = `card-topo ${statusC}`;
-                item.innerHTML = `
-                    <button class="btn-delete" onclick="removerCliente(${c.id})">✕</button>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <span style="color:#fff; font-weight:bold; letter-spacing:1px; font-size: 16px;">${c.nome}</span>
-                        <span style="color:#d4af37; font-size: 20px; font-weight: 700;">R$ ${valorFinalCobrado.toLocaleString('pt-br', {minimumFractionDigits: 2})}</span>
-                    </div>
-                    <div style="font-size: 11px; color: #888; line-height: 1.6;">
-                        <div><span class="dot ${dot}"></span>${statusT}: ${dataV.toLocaleDateString('pt-br')}</div>
-                        <div style="display: flex; justify-content: space-between; color: #444; margin-top: 5px;">
-                            <span>Inv.: R$ ${c.valorOriginal.toFixed(2)}</span>
-                            ${jurosAtraso > 0 ? `<span style="color: #e74c3c;">Juros Venc.: R$ ${jurosAtraso.toFixed(2)}</span>` : ''}
-                        </div>
-                    </div>
-                `;
-                lista.prepend(item);
-            });
-            displayTotal.innerText = `R$ ${totalGeralComJuros.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-        }
-
-        function removerCliente(id) {
-            if(confirm("Deseja confirmar o pagamento/exclusão?")) {
-                clientes = clientes.filter(c => c.id !== id);
-                localStorage.setItem('clientes_van_wallet', JSON.stringify(clientes));
-                renderizarLista();
-            }
-        }
-    </script>
-</body>
-</html>
+                if (dataV.
