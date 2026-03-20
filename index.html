@@ -5,92 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carteira Pessoal Vanubia</title>
     <style>
-        /* --- ESTILO BASE E FUNDO (MANTIDO) --- */
+        /* --- ESTILO BASE PREMIUM --- */
         body, html {
             height: 100%;
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle, #0a192f 0%, #02060c 100%);
+            font-family: 'Times New Roman', Times, serif; /* Fonte mais clássica e elegante */
+            background-color: #000; /* Fundo preto absoluto */
+            background-image: radial-gradient(circle, #1a1a1a 0%, #000000 70%); /* Brilho central suave */
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #e0e0e0;
+            color: #d4af37; /* Dourado suave para textos gerais */
             overflow: hidden;
         }
 
-        /* --- CONTAINER CENTRAL (MODIFICADO para suportar animação) --- */
+        /* --- CONTAINER DE LOGIN ELEGANTE --- */
         .login-container {
-            background-color: rgba(255, 255, 255, 0.03);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            width: 350px;
+            background: rgba(10, 10, 10, 0.9); /* Fundo escuro quase opaco */
+            padding: 50px 40px;
+            border-radius: 4px; /* Bordas menos arredondadas, mais sóbrias */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Sombra profunda */
+            border: 1px solid #aa8528; /* Borda dourada fina e envelhecida */
+            width: 320px;
             text-align: center;
-            transition: all 0.5s ease-in-out; /* Animação suave de tamanho */
-        }
-
-        /* --- LOGO DOURADA (MANTIDA) --- */
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-            color: #ffd700; 
-            text-shadow: 0 0 5px #ff4500, 0 0 10px #ffd700, 0 0 20px #ffd700;
-        }
-
-        /* --- ESTILO DOS CAMPOS DE LOGIN (MANTIDO) --- */
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .input-group label { display: block; margin-bottom: 5px; color: #a0a0a0; font-size: 14px; }
-        .input-group input {
-            width: 100%; padding: 12px; background-color: rgba(0, 0, 0, 0.3);
-            border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 16px;
-            box-sizing: border-box; transition: all 0.3s ease;
-        }
-        .input-group input:focus { outline: none; border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-
-        /* --- ESTILO DOS BOTÕES DOURADOS (MANTIDO) --- */
-        .btn-gold {
-            width: 100%; padding: 12px;
-            background: linear-gradient(45deg, #bf9b30, #ffd700);
-            color: #000; border: none; border-radius: 8px;
-            font-size: 18px; font-weight: bold; cursor: pointer;
-            transition: all 0.3s ease; text-transform: uppercase;
-            letter-spacing: 1px; margin-top: 10px;
-        }
-        .btn-gold:hover { box-shadow: 0 0 15px #ffd700; transform: translateY(-2px); }
-
-        /* --- CLASSES DE ANIMAÇÃO (NOVO ITEM) --- */
-        
-        /* Inicialmente, escondemos o formulário de login */
-        #loginForm {
-            display: none; /* Esconde completamente */
-            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); /* Animação suave */
+            opacity: 0; /* Começa invisível para o efeito de entrada */
             transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
         }
-
-        /* Classe que o JavaScript vai adicionar para mostrar o formulário */
-        #loginForm.mostrar {
-            display: block; /* Mostra o elemento */
+        
+        /* Classe para mostrar o container com animação ao carregar a página */
+        .login-container.carregado {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Estilo para o botão inicial 'Entrar' */
-        #btnInicial {
-            display: block; /* Visível no início */
+        /* --- LOGO DOURADA PRESTÍGIO --- */
+        .logo {
+            font-size: 32px;
+            font-weight: 300; /* Mais fina para elegância */
+            text-transform: uppercase;
+            letter-spacing: 4px; /* Espaçamento chique */
+            margin-bottom: 40px;
+            color: #d4af37; /* Dourado metálico */
+            /* Brilho sofisticado, não neon */
+            text-shadow: 0px 2px 4px rgba(170, 133, 40, 0.5); 
         }
 
-        /* Esconde o botão inicial com animação */
-        #btnInicial.esconder {
-            display: none;
+        /* --- ESTILO DO CAMPO DE SENHA --- */
+        .input-group {
+            margin-bottom: 25px;
+            text-align: center; /* Centralizar label e input */
+        }
+        
+        /* Label 'Senha Pessoal' */
+        .input-group label { 
+            display: block; 
+            margin-bottom: 10px; 
+            color: #aa8528; 
+            font-size: 14px; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Campo de Input */
+        .input-group input {
+            width: 80%; /* Não ocupa tudo, fica mais centralizado */
+            padding: 15px; 
+            background-color: #0a0a0a;
+            border: none;
+            border-bottom: 1px solid #444; /* Apenas linha inferior para visual limpo */
+            color: #fff; 
+            font-size: 20px; /* Senha maior */
+            text-align: center; /* Centralizar os pontos da senha */
+            letter-spacing: 5px; /* Espaçamento nos pontos da senha */
+            box-sizing: border-box; 
+            transition: all 0.3s ease;
+        }
+        
+        /* Efeito ao clicar: a linha fica dourada */
+        .input-group input:focus { 
+            outline: none; 
+            border-bottom: 1px solid #d4af37;
+        }
+
+        /* --- ESTILO DO BOTÃO ACESSAR --- */
+        .btn-gold {
+            width: 80%; 
+            padding: 15px;
+            background: none; /* Sem fundo colorido */
+            border: 1px solid #d4af37; /* Borda dourada */
+            color: #d4af37; 
+            border-radius: 2px;
+            font-size: 16px; 
+            font-weight: 300; 
+            cursor: pointer;
+            transition: all 0.4s ease; 
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        /* Efeito ao passar o mouse: preenche com dourado */
+        .btn-gold:hover { 
+            background-color: #d4af37;
+            color: #000;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
         }
 
     </style>
@@ -99,20 +117,15 @@
 
     <div class="login-container" id="containerPrincipal">
         <div class="logo">
-            Carteira Pessoal<br>Vanubia
+            Vanubia<br>
+            <span style="font-size: 16px; letter-spacing: 2px; color: #aa8528;">Carteira Pessoal</span>
         </div>
 
-        <button class="btn-gold" id="btnInicial" onclick="revelarLogin()">Entrar</button>
-
         <form id="loginForm" action="#" method="post" onsubmit="verificarSenha(event)">
+            
             <div class="input-group">
-                <label for="usuario">Usuário</label>
-                <input type="text" id="usuario" name="usuario" value="Vanubia" readonly>
-            </div>
-
-            <div class="input-group">
-                <label for="senha">Senha Segurança</label>
-                <input type="password" id="senha" name="senha" placeholder="••••" required autofocus>
+                <label for="senha">Senha de Acesso</label>
+                <input type="password" id="senha" name="senha" placeholder="••••" required maxlength="4">
             </div>
 
             <button type="submit" class="btn-gold">Acessar</button>
@@ -121,19 +134,10 @@
     </div>
 
     <script>
-        // ITEM: LÓGICA DE REVELAÇÃO
-        function revelarLogin() {
-            const btnInicial = document.getElementById('btnInicial');
-            const loginForm = document.getElementById('loginForm');
-            
-            // 1. Esconde o botão inicial
-            btnInicial.classList.add('esconder');
-            
-            // 2. Mostra o formulário com animação (precisa de um pequeno delay para o display block funcionar com opacity)
-            loginForm.style.display = 'block';
-            setTimeout(() => {
-                loginForm.classList.add('mostrar');
-            }, 10);
+        // Animação de entrada ao carregar a página
+        window.onload = function() {
+            document.getElementById('containerPrincipal').classList.add('carregado');
+            document.getElementById('senha').focus(); // Já foca no campo de senha
         }
 
         // ITEM: VALIDAÇÃO DA SENHA DEFINIDA (9656)
@@ -144,8 +148,36 @@
             const SENHA_CORRETA = "9656"; // Sua senha definida
 
             if (senhaDigitada === SENHA_CORRETA) {
-                alert("Acesso Autorizado! Bem-vinda à sua Carteira Pessoal, Vanubia.");
-                // Próximo passo: Redirecionar para a tela de empréstimos
+                // Efeito simples de sucesso antes de entrar
+                document.getElementById('containerPrincipal').style.borderColor = "#00ff00";
+                document.getElementById('containerPrincipal').style.boxShadow = "0 0 20px rgba(0, 255, 0, 0.3)";
+                
+                setTimeout(() => {
+                    alert("Acesso Autorizado. Bem-vinda!");
+                    // Próximo passo: Redirecionar para a tela de empréstimos
+                }, 500);
+
+            } else {
+                // Efeito de erro (piscar vermelho)
+                const container = document.getElementById('containerPrincipal');
+                container.style.borderColor = "#ff0000";
+                container.style.boxShadow = "0 0 20px rgba(255, 0, 0, 0.3)";
+                
+                alert("Senha Incorreta.");
+                
+                // Reseta a cor após o alerta
+                setTimeout(() => {
+                    container.style.borderColor = "#aa8528";
+                    container.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.8)";
+                    document.getElementById('senha').value = ''; 
+                    document.getElementById('senha').focus();
+                }, 200);
+            }
+        }
+    </script>
+
+</body>
+</html>
             } else {
                 alert("Senha Incorreta. Tente novamente.");
                 document.getElementById('senha').value = ''; // Limpa o campo
