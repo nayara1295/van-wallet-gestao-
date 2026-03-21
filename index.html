@@ -60,15 +60,15 @@
 
         <div id="step-3" class="step">
             <h2 id="nome-final" style="color:#d4af37"></h2>
-            <p>Escolha o Prazo:</p>
+            <p style="color:#666; font-size: 14px;">1. Selecione a Data (se for antigo):</p>
+            <input type="date" id="w-data-manual" class="input-cadastro" style="font-size: 16px; padding: 12px; border-color: #444; margin-bottom: 20px;">
+            
+            <p>2. Clique no Prazo para Finalizar:</p>
             <div style="margin-bottom: 20px;">
                 <button class="btn-prazo" onclick="finalizar(7)">7 D</button>
                 <button class="btn-prazo" onclick="finalizar(15)">15 D</button>
                 <button class="btn-prazo" onclick="finalizar(30)">30 D</button>
             </div>
-            <hr style="border: 0; border-top: 1px solid #222; width: 80%; margin: 20px auto;">
-            <p style="color:#666; font-size: 14px;">Data do Empréstimo:</p>
-            <input type="date" id="w-data-manual" class="input-cadastro" style="font-size: 16px; padding: 12px; border-color: #444;">
         </div>
     </div>
 
@@ -88,9 +88,10 @@
             document.getElementById('modal-wizard').style.display = 'flex'; 
             resetSteps();
             const hoje = new Date();
-            const offset = hoje.getTimezoneOffset();
-            const corrigida = new Date(hoje.getTime() - (offset*60*1000));
-            document.getElementById('w-data-manual').value = corrigida.toISOString().split('T')[0];
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            document.getElementById('w-data-manual').value = `${ano}-${mes}-${dia}`;
         }
 
         function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
@@ -111,34 +112,32 @@
         }
 
         function finalizar(dias) {
-            try {
-                const nome = document.getElementById('w-nome').value;
-                const valor = parseFloat(document.getElementById('w-valor').value);
-                const dataManualStr = document.getElementById('w-data-manual').value;
+            const nome = document.getElementById('w-nome').value;
+            const valor = parseFloat(document.getElementById('w-valor').value);
+            const dataManualStr = document.getElementById('w-data-manual').value;
 
-                if(nome && valor && dataManualStr) {
-                    // RESOLUÇÃO DA TRAVA: Usar substituição de traços por barras para forçar leitura correta
-                    const dataLimpa = dataManualStr.replace(/-/g, '\/');
-                    const dataInicio = new Date(dataLimpa);
-                    dataInicio.setHours(0,0,0,0);
+            if(nome && valor && dataManualStr) {
+                // AQUI ESTÁ A SOLUÇÃO: Desmontar a data para não travar
+                const partes = dataManualStr.split('-');
+                const dataInicio = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+                dataInicio.setHours(0,0,0,0);
 
-                    const dataVenc = new Date(dataInicio);
-                    dataVenc.setDate(dataInicio.getDate() + dias);
-                    
-                    db.push({
-                        id: Date.now(),
-                        nome: nome,
-                        dataCriacao: dataInicio.toLocaleDateString('pt-BR'),
-                        capital: valor,
-                        baseCobrar: valor * 1.40,
-                        venci: dataVenc.getTime(),
-                        venciFormat: dataVenc.toLocaleDateString('pt-BR')
-                    });
-                    localStorage.setItem('van_vFinal', JSON.stringify(db));
-                    fecharCadastro(); render();
-                }
-            } catch (e) {
-                alert("Erro ao salvar: Tente selecionar a data novamente.");
+                const dataVenc = new Date(dataInicio);
+                dataVenc.setDate(dataInicio.getDate() + dias);
+                
+                db.push({
+                    id: Date.now(),
+                    nome: nome,
+                    dataCriacao: dataInicio.toLocaleDateString('pt-BR'),
+                    capital: valor,
+                    baseCobrar: valor * 1.40,
+                    venci: dataVenc.getTime(),
+                    venciFormat: dataVenc.toLocaleDateString('pt-BR')
+                });
+                
+                localStorage.setItem('van_vFinal', JSON.stringify(db));
+                fecharCadastro(); 
+                render();
             }
         }
 
@@ -156,13 +155,21 @@
             let somaTotal = 0;
             const hojeTs = new Date().setHours(0,0,0,0);
             db.sort((a, b) => a.venci - b.venci);
+
             db.forEach(i => {
                 const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
                 let valorFinal = i.baseCobrar;
                 let multa = 0;
                 let classe = "card-ok", corTxt = "#00ff00", statusTxt = `Faltam ${diff} dias`;
-                if(diff === 0) { classe = "card-hoje"; corTxt = "#fff"; statusTxt = "VENCE HOJE"; }
-                else if(diff < 0) { multa = Math.abs(diff) * 30; valorFinal = i.baseCobrar + multa; classe = "card-atraso"; corTxt = "#fff"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`; }
+
+                if(diff === 0) { 
+                    classe = "card-hoje"; corTxt = "#fff"; statusTxt = "VENCE HOJE"; 
+                } else if(diff < 0) {
+                    multa = Math.abs(diff) * 30;
+                    valorFinal = i.baseCobrar + multa;
+                    classe = "card-atraso"; corTxt = "#fff"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`;
+                }
+
                 somaTotal += valorFinal;
                 lista.innerHTML += `<div class="cliente-card ${classe}">${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}<div><span style="font-weight: 600;">${i.nome}</span><br><span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span><span style="color: ${corTxt}; font-size:12px; font-weight:800;">${statusTxt}</span></div><div class="acoes-btn"><button class="baixa-btn" onclick="remover(${i.id})">BAIXA</button><button class="info-btn" onclick="verInfo(${i.id})">INFO</button></div></div>`;
             });
