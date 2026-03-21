@@ -21,7 +21,7 @@
         #modal-wizard { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; flex-direction: column; align-items: center; justify-content: center; }
         .step { display: none; text-align: center; width: 100%; }
         .step.active { display: block; }
-        .btn-prazo { background: transparent; border: 2px solid #d4af37; color: #d4af37; padding: 18px; width: 240px; border-radius: 15px; margin: 10px; font-weight: 700; cursor: pointer; }
+        .btn-prazo { background: transparent; border: 2px solid #d4af37; color: #d4af37; padding: 15px; width: 80px; border-radius: 12px; margin: 5px; font-weight: 700; cursor: pointer; }
         .acoes-btn { display: flex; flex-direction: column; gap: 8px; }
         .baixa-btn { background: #fff; color: #000; border: none; padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
         .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
@@ -47,28 +47,30 @@
     <div id="modal-wizard">
         <div id="step-1" class="step active">
             <h2>Nome do Cliente</h2>
-            <input type="text" id="w-nome" class="input-cadastro" placeholder="Digite o nome...">
-            <br><button class="btn-gold" style="margin-top: 20px;" onclick="nextStep(2)">PRÓXIMO</button>
+            <input type="text" id="w-nome" class="input-cadastro" placeholder="Nome...">
+            <br><button class="btn-gold" onclick="nextStep(2)">PRÓXIMO</button>
             <p onclick="fecharCadastro()" style="color:#666; margin-top:30px; cursor:pointer;">Cancelar</p>
         </div>
-        <div id="step-2" class="step">
-            <h2 style="color:#fff">Qual o Valor?</h2>
-            <input type="number" id="w-valor" class="input-cadastro" placeholder="R$ 0,00">
-            <br><button class="btn-gold" style="margin-top: 20px;" onclick="nextStep(3)">PRÓXIMO</button>
-        </div>
         
-        <div id="step-3" class="step">
-            <h2 style="color:#fff">Data do Empréstimo</h2>
-            <p style="color:#666">Padrão: Hoje</p>
-            <input type="date" id="w-data-manual" class="input-cadastro">
-            <br><button class="btn-gold" style="margin-top: 20px;" onclick="nextStep(4)">DEFINIR PRAZO</button>
+        <div id="step-2" class="step">
+            <h2>Valor do Empréstimo</h2>
+            <input type="number" id="w-valor" class="input-cadastro" placeholder="R$ 0,00">
+            <br><button class="btn-gold" onclick="nextStep(3)">PRÓXIMO</button>
         </div>
 
-        <div id="step-4" class="step">
-            <h2 style="color:#fff">Prazo de Retorno</h2>
-            <button class="btn-prazo" onclick="finalizar(7)">7 DIAS</button>
-            <button class="btn-prazo" onclick="finalizar(15)">15 DIAS</button>
-            <button class="btn-prazo" onclick="finalizar(30)">30 DIAS</button>
+        <div id="step-3" class="step">
+            <h2 id="nome-final" style="color:#d4af37"></h2>
+            <p>Escolha o Prazo:</p>
+            <div style="margin-bottom: 20px;">
+                <button class="btn-prazo" onclick="finalizar(7)">7 D</button>
+                <button class="btn-prazo" onclick="finalizar(15)">15 D</button>
+                <button class="btn-prazo" onclick="finalizar(30)">30 D</button>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid #222; width: 80%; margin: 20px auto;">
+            
+            <p style="color:#666; font-size: 14px;">Data Manual (Se for antigo):</p>
+            <input type="date" id="w-data-manual" class="input-cadastro" style="font-size: 16px; padding: 12px; border-color: #444;">
         </div>
     </div>
 
@@ -87,15 +89,19 @@
         function abrirCadastro() { 
             document.getElementById('modal-wizard').style.display = 'flex'; 
             resetSteps();
-            // Define a data de hoje como padrão no calendário
+            // Define hoje como padrão no calendário
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('w-data-manual').value = hoje;
         }
+
         function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
         
         function nextStep(n) {
+            if(n === 2 && document.getElementById('w-nome').value === "") return;
+            if(n === 3 && document.getElementById('w-valor').value === "") return;
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-' + n).classList.add('active');
+            if(n === 3) document.getElementById('nome-final').innerText = document.getElementById('w-nome').value;
         }
 
         function resetSteps() {
@@ -111,9 +117,8 @@
             const dataManualStr = document.getElementById('w-data-manual').value;
 
             if(nome && valor && dataManualStr) {
-                // Criar data base a partir da escolha manual (ajustando fuso horário)
-                const partesData = dataManualStr.split('-');
-                const dataInicio = new Date(partesData[0], partesData[1] - 1, partesData[2]);
+                const partes = dataManualStr.split('-');
+                const dataInicio = new Date(partes[0], partes[1] - 1, partes[2]);
                 dataInicio.setHours(0,0,0,0);
 
                 const dataVenc = new Date(dataInicio);
@@ -125,71 +130,4 @@
                     dataCriacao: dataInicio.toLocaleDateString('pt-BR'),
                     capital: valor,
                     baseCobrar: valor * 1.40,
-                    venci: dataVenc.getTime(),
-                    venciFormat: dataVenc.toLocaleDateString('pt-BR')
-                });
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                fecharCadastro(); render();
-            }
-        }
-
-        function verInfo(id) {
-            const i = db.find(item => item.id === id);
-            const hojeTs = new Date().setHours(0,0,0,0);
-            const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
-            let multa = diff < 0 ? Math.abs(diff) * 30 : 0;
-
-            alert(
-                `DETALHES:\n\n` +
-                `👤 Cliente: ${i.nome}\n` +
-                `📅 Data Empréstimo: ${i.dataCriacao}\n` +
-                `🏁 Vencimento: ${i.venciFormat}\n` +
-                `💰 Valor Base + Lucro: R$ ${i.baseCobrar.toFixed(2)}\n` +
-                `🚨 Multa Acumulada: R$ ${multa.toFixed(2)}\n\n` +
-                `TOTAL A RECEBER: R$ ${(i.baseCobrar + multa).toFixed(2)}`
-            );
-        }
-
-        function render() {
-            const lista = document.getElementById('lista-clientes');
-            lista.innerHTML = "";
-            let somaTotal = 0;
-            const hojeTs = new Date().setHours(0,0,0,0);
-
-            db.sort((a, b) => a.venci - b.venci);
-
-            db.forEach(i => {
-                const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
-                let valorFinal = i.baseCobrar;
-                let multa = 0;
-                let classe = "card-ok", corTxt = "#00ff00", statusTxt = `Faltam ${diff} dias`;
-
-                if(diff === 0) { 
-                    classe = "card-hoje"; corTxt = "#fff"; statusTxt = "VENCE HOJE"; 
-                } else if(diff < 0) {
-                    multa = Math.abs(diff) * 30;
-                    valorFinal = i.baseCobrar + multa;
-                    classe = "card-atraso"; corTxt = "#fff"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`;
-                }
-
-                somaTotal += valorFinal;
-                lista.innerHTML += `
-                    <div class="cliente-card ${classe}">
-                        ${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}
-                        <div>
-                            <span style="font-weight: 600;">${i.nome}</span><br>
-                            <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span>
-                            <span style="color: ${corTxt}; font-size:12px; font-weight:800;">${statusTxt}</span>
-                        </div>
-                        <div class="acoes-btn">
-                            <button class="baixa-btn" onclick="remover(${i.id})">BAIXA</button>
-                            <button class="info-btn" onclick="verInfo(${i.id})">INFO</button>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        }
-        function remover(id) { if(confirm("Confirmar recebimento?")) { db = db.filter(c => c.id !== id); localStorage.setItem('van_vFinal', JSON.stringify(db)); render(); } }
-    </script>
-</body>
-</html>
+                    venci: dataVenc.getTime
