@@ -7,12 +7,14 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background-color: #000; font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
         
+        /* ALERTA PERSONALIZADO */
         #aviso-erro {
             display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: #ff4d4d; color: #000; padding: 15px 30px; border-radius: 15px;
             font-weight: 900; z-index: 11000; box-shadow: 0 10px 30px rgba(255,77,77,0.5);
         }
 
+        /* TELA DE LOGIN */
         #tela-login { position: fixed; inset: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
         .logo-login { letter-spacing: 5px; color: #d4af37; font-size: 32px; font-weight: 900; margin-bottom: 30px; }
         
@@ -25,10 +27,12 @@
         .shake { animation: shake 0.3s; border-color: #ff4d4d !important; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 
+        /* DASHBOARD */
         .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; padding-bottom: 100px; }
         .card-total { background: linear-gradient(145deg, #151515, #050505); padding: 30px; border-radius: 25px; border: 1px solid #222; text-align: center; margin: 20px 0; border-bottom: 3px solid #d4af37; }
         
+        /* CLIENTES */
         .cliente-card { border-radius: 22px; margin-bottom: 15px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
         .card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
         .card-hoje { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
@@ -36,18 +40,21 @@
         
         .acoes-btn { display: flex; flex-direction: column; gap: 6px; min-width: 95px; }
         .baixa-btn { background: #00ff00; color: #000; border: none; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 900; }
-        
+        .edit-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 900; }
+        .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #333; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 900; }
+
+        /* MODAIS */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
         .input-cadastro { padding: 18px; width: 85%; border-radius: 12px; border: 2px solid #d4af37; background: #1a1a1a; color: #fff; font-size: 20px; text-align: center; outline: none; margin: 15px auto; display: block; }
 
-        #calc-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #222; border-radius: 20px; display: flex; align-items: center; justify-content: center; z-index: 8000; color: #d4af37; border: 1px solid #d4af37; }
+        /* ÍCONE DA CALCULADORA ATUALIZADO */
+        #calc-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #222; border-radius: 20px; display: flex; align-items: center; justify-content: center; z-index: 8000; color: #fff; border: 1px solid #444; }
+        .icon-calc { width: 14px; height: 18px; border: 2px solid #d4af37; border-radius: 2px; position: relative; }
+        .icon-calc::before { content: ''; position: absolute; top: 2px; left: 2px; width: 10px; height: 2px; background: #d4af37; border-radius: 1px; }
+        .icon-calc::after { content: '::'; position: absolute; bottom: 2px; left: 2px; width: 10px; color: #d4af37; font-size: 10px; line-height: 4px; letter-spacing: 1px; text-align: center; }
         
-        /* NOVO ÍCONE DA CALCULADORA (MENOR E MAIS MODERNO) */
-        .icon-calc { width: 16px; height: 20px; border: 2px solid #d4af37; border-radius: 2px; position: relative; }
-        .icon-calc:before { content:''; position:absolute; top:2px; left:2px; width:8px; height:3px; background:#d4af37; }
-
         #calc-container { display: none; position: fixed; bottom: 90px; right: 20px; width: 280px; background: #111; border: 1px solid #333; border-radius: 25px; padding: 15px; z-index: 8500; }
-        #calc-display { width: 100%; height: 60px; background: #000; color: #fff; font-size: 30px; text-align: right; padding: 10px; box-sizing: border-box; border-radius: 15px; margin-bottom: 12px; border: 1px solid #222; }
+        #calc-display { width: 100%; height: 60px; background: #000; color: #fff; font-size: 30px; text-align: right; padding: 10px; box-sizing: border-box; border-radius: 15px; margin-bottom: 12px; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .calc-btn { padding: 18px 0; border-radius: 12px; border: none; background: #1a1a1a; color: #fff; font-weight: 700; }
     </style>
@@ -58,13 +65,13 @@
 
     <div id="tela-login">
         <div class="logo-login">VAN WALLET</div>
-        <input type="text" id="pin-main" class="pin-field" placeholder="••••" maxlength="4" inputmode="numeric" oninput="checarLogin(this.value)">
-        <button class="btn-gold" onclick="checarLogin(document.getElementById('pin-main').value)">ENTRAR</button>
+        <input type="number" id="pin-main" class="pin-field" placeholder="0000" pattern="\d*">
+        <button class="btn-gold" onclick="validarAcesso()">ENTRAR</button>
     </div>
 
     <div id="conteudo-privado">
         <div class="card-total">
-            <small style="color: #666; font-weight: bold; letter-spacing: 1px;">TOTAL NA RUA</small>
+            <small style="color: #666; font-weight: bold;">TOTAL NA RUA</small>
             <h1 id="total-rua" style="font-size: 45px; margin: 10px 0; color:#d4af37">R$ 0,00</h1>
         </div>
         <button class="btn-gold" style="width: 100%; border-radius: 20px;" onclick="abrirModal('modal-cadastro')">+ NOVO EMPRÉSTIMO</button>
@@ -72,7 +79,6 @@
     </div>
 
     <div id="calc-fab" onclick="toggleCalc()"><div class="icon-calc"></div></div>
-    
     <div id="calc-container">
         <div id="calc-display">0</div>
         <div class="calc-grid">
@@ -93,81 +99,4 @@
             <button class="calc-btn" onclick="cIgual()">=</button>
             <button class="calc-btn" style="grid-column: span 2;" onclick="cNum('0')">0</button>
             <button class="calc-btn" onclick="cNum('.')">.</button>
-            <button class="calc-btn" onclick="toggleCalc()" style="background: #222;">✕</button>
-        </div>
-    </div>
-
-    <div id="modal-cadastro" class="modal-overlay">
-        <h2 style="color:#d4af37">Novo Cliente</h2>
-        <input type="text" id="cad-nome" class="input-cadastro" placeholder="Nome">
-        <input type="number" id="cad-valor" class="input-cadastro" placeholder="0.00">
-        <input type="date" id="cad-data" class="input-cadastro">
-        <button class="btn-gold" style="background: #00ff00;" onclick="salvarNovo()">SALVAR</button>
-        <p onclick="fecharModal('modal-cadastro')" style="color:#666; margin-top:20px; cursor:pointer;">CANCELAR</p>
-    </div>
-
-    <script>
-        const PIN = "9656";
-        let db = JSON.parse(localStorage.getItem('van_v2_gold')) || [];
-
-        function checarLogin(v) { 
-            if(v === PIN) { 
-                document.getElementById('tela-login').style.display = 'none'; 
-                document.getElementById('conteudo-privado').style.display = 'block'; 
-                render(); 
-            } else if(v.length === 4) {
-                const aviso = document.getElementById('aviso-erro');
-                aviso.style.display = 'block';
-                document.getElementById('pin-main').classList.add('shake');
-                setTimeout(() => {
-                    aviso.style.display = 'none';
-                    document.getElementById('pin-main').classList.remove('shake');
-                    document.getElementById('pin-main').value = "";
-                }, 1500);
-            }
-        }
-
-        let cExp = "";
-        function toggleCalc() { const c = document.getElementById('calc-container'); c.style.display = (c.style.display === 'block') ? 'none' : 'block'; }
-        function cNum(n) { cExp += n; document.getElementById('calc-display').innerText = cExp; }
-        function cOp(o) { cExp += o; document.getElementById('calc-display').innerText = cExp; }
-        function cLimpar() { cExp = ""; document.getElementById('calc-display').innerText = "0"; }
-        function cIgual() { try { cExp = eval(cExp).toString(); document.getElementById('calc-display').innerText = cExp; } catch { cLimpar(); } }
-
-        function abrirModal(id) { document.getElementById(id).style.display = 'flex'; document.getElementById('cad-data').valueAsDate = new Date(); }
-        function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function salvarNovo() {
-            const n = document.getElementById('cad-nome').value, v = parseFloat(document.getElementById('cad-valor').value), d = document.getElementById('cad-data').value;
-            if(!n || !v || !d) return;
-            const dI = new Date(d + "T12:00:00"), dV = new Date(dI); dV.setDate(dI.getDate() + 7);
-            db.push({ id: Date.now(), nome: n, valT: v * 1.4, venci: dV.getTime(), dia: dV.toLocaleDateString('pt-BR', {weekday: 'long'}) });
-            localStorage.setItem('van_v2_gold', JSON.stringify(db)); fecharModal('modal-cadastro'); render();
-        }
-
-        function render() {
-            const lista = document.getElementById('lista-clientes'); lista.innerHTML = "";
-            let t = 0; const hoje = new Date().setHours(0,0,0,0);
-            db.sort((a,b) => a.venci - b.venci).forEach(i => {
-                const diff = Math.ceil((i.venci - hoje) / 86400000);
-                let totalC = i.valT + (diff < 0 ? Math.abs(diff) * 40 : 0);
-                t += totalC;
-                let cl = diff < 0 ? "card-atraso" : (diff === 0 ? "card-hoje" : "card-ok");
-                lista.innerHTML += `
-                    <div class="cliente-card ${cl}">
-                        <div>
-                            <span style="font-weight:600; text-transform: uppercase;">${i.nome}</span><br>
-                            <span style="font-size:26px; font-weight:900;">R$ ${totalC.toFixed(2)}</span><br>
-                            <small style="color:#d4af37;">${i.dia.toUpperCase()}</small>
-                        </div>
-                        <div class="acoes-btn">
-                            <button class="baixa-btn" onclick="darBaixa(${i.id})">BAIXAR</button>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('total-rua').innerText = "R$ " + t.toLocaleString('pt-BR', {minimumFractionDigits:2});
-        }
-        function darBaixa(id) { if(prompt("PIN:") === PIN) { db = db.filter(x => x.id !== id); localStorage.setItem('van_v2_gold', JSON.stringify(db)); render(); } }
-    </script>
-</body>
-</html>
+            <button class="calc-btn" onclick="toggleCalc
