@@ -1,145 +1,335 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!DOCTYPE html><html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VAN WALLET - V2 PREMIUM</title>
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; background-color: #000; font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
-        
-        #aviso-erro {
-            display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #ff4d4d; color: #000; padding: 15px 30px; border-radius: 15px;
-            font-weight: 900; z-index: 11000; box-shadow: 0 10px 30px rgba(255,77,77,0.5);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VAN WALLET - V2 PREMIUM</title><style>
+body, html { margin: 0; padding: 0; height: 100%; background-color: #000; font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
 
-        #tela-login { position: fixed; inset: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
-        .logo-login { letter-spacing: 5px; color: #d4af37; font-size: 32px; font-weight: 900; margin-bottom: 30px; }
-        
-        .pin-field { 
-            padding: 20px; width: 180px; border-radius: 20px; border: 2px solid #d4af37; 
-            background: #111; color: #d4af37; font-size: 35px; text-align: center; 
-            outline: none; margin-bottom: 20px; letter-spacing: 12px; display: block;
-        }
-        .shake { animation: shake 0.3s; border-color: #ff4d4d !important; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+#aviso-erro {
+display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+background: #ff4d4d; color: #000; padding: 15px 30px; border-radius: 15px;
+font-weight: 900; z-index: 11000; box-shadow: 0 10px 30px rgba(255,77,77,0.5);
+}
 
-        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-        #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; padding-bottom: 100px; }
-        .card-total { background: linear-gradient(145deg, #151515, #050505); padding: 30px; border-radius: 25px; border: 1px solid #222; text-align: center; margin: 20px 0; border-bottom: 3px solid #d4af37; }
-        
-        .cliente-card { border-radius: 22px; margin-bottom: 15px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
-        .card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
-        .card-hoje { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
-        .card-atraso { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; }
-        
-        .acoes-btn { display: flex; flex-direction: column; gap: 6px; min-width: 95px; }
-        .baixa-btn { background: #00ff00; color: #000; border: none; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 900; }
-        
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-        .input-cadastro { padding: 18px; width: 85%; border-radius: 12px; border: 2px solid #d4af37; background: #1a1a1a; color: #fff; font-size: 20px; text-align: center; outline: none; margin: 15px auto; display: block; }
-    </style>
-</head>
-<body>
+#tela-login { position: fixed; inset: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
+.logo-login { letter-spacing: 5px; color: #d4af37; font-size: 32px; font-weight: 900; margin-bottom: 30px; }
 
-    <div id="aviso-erro">PIN INCORRETO!</div>
+.pin-field {
+padding: 20px; width: 180px; border-radius: 20px; border: 2px solid #d4af37;
+background: #111; color: #d4af37; font-size: 35px; text-align: center;
+outline: none; margin-bottom: 20px; letter-spacing: 12px; display: block;
+-webkit-text-security: disc;
+}
 
-    <div id="tela-login">
-        <div class="logo-login">VAN WALLET</div>
-        <input type="number" id="pin-input" class="pin-field" placeholder="0000" pattern="\d*">
-        <button class="btn-gold" onclick="tentarEntrar()">ENTRAR</button>
-    </div>
+.shake { animation: shake 0.3s; border-color: #ff4d4d !important; }
 
-    <div id="conteudo-privado">
-        <div class="card-total">
-            <small style="color: #666; font-weight: bold;">TOTAL NA RUA</small>
-            <h1 id="total-rua" style="font-size: 45px; margin: 10px 0; color:#d4af37">R$ 0,00</h1>
-        </div>
-        <button class="btn-gold" style="width: 100%; border-radius: 20px;" onclick="abrirModal()">+ NOVO EMPRÉSTIMO</button>
-        <div id="lista-clientes" style="margin-top: 30px;"></div>
-    </div>
+@keyframes shake {
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-8px); }
+75% { transform: translateX(8px); }
+}
 
-    <div id="modal-cadastro" class="modal-overlay">
-        <h2 style="color:#d4af37">Novo Cliente</h2>
-        <input type="text" id="n-nome" class="input-cadastro" placeholder="Nome">
-        <input type="number" id="n-valor" class="input-cadastro" placeholder="Valor">
-        <input type="date" id="n-data" class="input-cadastro">
-        <button class="btn-gold" style="background:#00ff00" onclick="salvar()">SALVAR</button>
-        <p onclick="fecharModal()" style="color:#666; margin-top:15px;">CANCELAR</p>
-    </div>
+.btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
-    <script>
-        const PIN_MEU = "9656";
-        let db = JSON.parse(localStorage.getItem('van_vFinal_99')) || [];
+#conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; padding-bottom: 100px; }
 
-        // ESCUTADOR DE TECLADO (LOGIN AUTOMÁTICO)
-        document.getElementById('pin-input').addEventListener('input', function(e) {
-            if(this.value.length === 4) tentarEntrar();
-        });
+.card-total {
+background: linear-gradient(145deg, #151515, #050505);
+padding: 30px;
+border-radius: 25px;
+border: 1px solid #222;
+text-align: center;
+margin: 20px 0;
+border-bottom: 3px solid #d4af37;
+}
 
-        function tentarEntrar() {
-            const v = document.getElementById('pin-input').value;
-            if(v === PIN_MEU) {
-                document.getElementById('tela-login').style.display = 'none';
-                document.getElementById('conteudo-privado').style.display = 'block';
-                render();
-            } else {
-                const campo = document.getElementById('pin-input');
-                document.getElementById('aviso-erro').style.display = 'block';
-                campo.classList.add('shake');
-                setTimeout(() => {
-                    document.getElementById('aviso-erro').style.display = 'none';
-                    campo.classList.remove('shake');
-                    campo.value = "";
-                }, 1500);
-            }
-        }
+.cliente-card {
+border-radius: 22px;
+margin-bottom: 15px;
+padding: 18px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+border: 1px solid #222;
+}
 
-        function abrirModal() { 
-            document.getElementById('modal-cadastro').style.display = 'flex'; 
-            document.getElementById('n-data').valueAsDate = new Date();
-        }
-        function fecharModal() { document.getElementById('modal-cadastro').style.display = 'none'; }
+.card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
+.card-hoje { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
+.card-atraso { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; }
 
-        function salvar() {
-            const n = document.getElementById('n-nome').value, v = parseFloat(document.getElementById('n-valor').value), d = document.getElementById('n-data').value;
-            if(!n || !v || !d) return;
-            const dV = new Date(d + "T12:00:00"); dV.setDate(dV.getDate() + 7);
-            db.push({ id: Date.now(), nome: n, valT: v * 1.4, venci: dV.getTime(), dia: dV.toLocaleDateString('pt-BR', {weekday: 'long'}) });
-            localStorage.setItem('van_vFinal_99', JSON.stringify(db));
-            fecharModal(); render();
-        }
+.acoes-btn { display: flex; flex-direction: column; gap: 6px; min-width: 95px; }
 
-        function baixar(id) {
-            if(confirm("Confirmar recebimento?")) {
-                db = db.filter(x => x.id !== id);
-                localStorage.setItem('van_vFinal_99', JSON.stringify(db));
-                render();
-            }
-        }
+.baixa-btn {
+background: #00ff00;
+color: #000;
+border: none;
+padding: 10px;
+border-radius: 10px;
+font-size: 11px;
+font-weight: 900;
+}
 
-        function render() {
-            const lista = document.getElementById('lista-clientes'); lista.innerHTML = "";
-            let t = 0; const hoje = new Date().setHours(0,0,0,0);
-            db.sort((a,b) => a.venci - b.venci).forEach(i => {
-                const diff = Math.ceil((i.venci - hoje) / 86400000);
-                let totalC = i.valT + (diff < 0 ? Math.abs(diff) * 40 : 0);
-                t += totalC;
-                let cl = diff < 0 ? "card-atraso" : (diff === 0 ? "card-hoje" : "card-ok");
-                let st = diff < 0 ? `ATRASADO ${Math.abs(diff)} DIA(S)` : (diff === 0 ? "VENCE HOJE" : `VENCERÁ EM ${diff} DIA(S)`);
-                lista.innerHTML += `
-                    <div class="cliente-card ${cl}">
-                        <div>
-                            <span style="font-weight:600; text-transform: uppercase; font-size: 13px;">${i.nome}</span><br>
-                            <span style="font-size:26px; font-weight:900;">R$ ${totalC.toFixed(2)}</span><br>
-                            <small style="color:#d4af37; font-weight:bold;">${i.dia.toUpperCase()}</small><br>
-                            <small>${st}</small>
-                        </div>
-                        <button class="baixa-btn" onclick="baixar(${i.id})">BAIXAR</button>
-                    </div>`;
-            });
-            document.getElementById('total-rua').innerText = "R$ " + t.toLocaleString('pt-BR', {minimumFractionDigits:2});
-        }
-    </script>
-</body>
+.modal-overlay {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.95);
+z-index: 9000;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+backdrop-filter: blur(15px);
+}
+
+.input-cadastro {
+padding: 18px;
+width: 85%;
+border-radius: 12px;
+border: 2px solid #d4af37;
+background: #1a1a1a;
+color: #fff;
+font-size: 20px;
+text-align: center;
+outline: none;
+margin: 15px auto;
+display: block;
+}
+
+/* CALCULADORA */
+#calc-fab {
+position: fixed;
+bottom: 20px;
+right: 20px;
+width: 60px;
+height: 60px;
+background: #222;
+border-radius: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 24px;
+z-index: 8000;
+color: #fff;
+border: 1px solid #444;
+}
+
+#calc-container {
+display: none;
+position: fixed;
+bottom: 90px;
+right: 20px;
+width: 280px;
+background: #111;
+border: 1px solid #333;
+border-radius: 25px;
+padding: 15px;
+z-index: 8500;
+}
+
+#calc-display {
+width: 100%;
+height: 60px;
+background: #000;
+color: #fff;
+font-size: 30px;
+text-align: right;
+padding: 10px;
+box-sizing: border-box;
+border-radius: 15px;
+margin-bottom: 12px;
+}
+
+.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+.calc-btn {
+padding: 18px 0;
+border-radius: 12px;
+border: none;
+background: #1a1a1a;
+color: #fff;
+font-weight: 700;
+}
+</style></head><body><div id="aviso-erro">PIN INCORRETO!</div><div id="tela-login">
+<div class="logo-login">VAN WALLET</div>
+<input type="password" id="pin-main" class="pin-field" placeholder="••••" maxlength="4" inputmode="numeric" oninput="checarLogin(this.value)">
+<button class="btn-gold" onclick="checarLogin(document.getElementById('pin-main').value)">ENTRAR</button>
+</div><div id="conteudo-privado">
+<div class="card-total">
+<small style="color: #666; font-weight: bold; letter-spacing: 1px;">TOTAL NA RUA</small>
+<h1 id="total-rua" style="font-size: 45px; margin: 10px 0; color:#d4af37">R$ 0,00</h1>
+</div><button class="btn-gold" style="width: 100%; border-radius: 20px;" onclick="abrirModal('modal-cadastro')">+ NOVO EMPRÉSTIMO</button>
+
+<div id="lista-clientes" style="margin-top: 30px;"></div>
+</div><div id="calc-fab" onclick="toggleCalc()">±</div><div id="calc-container">
+<div id="calc-display">0</div><div class="calc-grid">
+<button class="calc-btn" style="grid-column: span 2; color:#ff4d4d;" onclick="cLimpar()">C</button>
+<button class="calc-btn" onclick="cOp('/')">÷</button>
+<button class="calc-btn" onclick="cOp('*')">×</button><button class="calc-btn" onclick="cNum('7')">7</button>
+<button class="calc-btn" onclick="cNum('8')">8</button>
+<button class="calc-btn" onclick="cNum('9')">9</button>
+<button class="calc-btn" onclick="cOp('-')">-</button>
+
+<button class="calc-btn" onclick="cNum('4')">4</button>
+<button class="calc-btn" onclick="cNum('5')">5</button>
+<button class="calc-btn" onclick="cNum('6')">6</button>
+<button class="calc-btn" onclick="cOp('+')">+</button>
+
+<button class="calc-btn" onclick="cNum('1')">1</button>
+<button class="calc-btn" onclick="cNum('2')">2</button>
+<button class="calc-btn" onclick="cNum('3')">3</button>
+<button class="calc-btn" onclick="cIgual()">=</button>
+
+<button class="calc-btn" style="grid-column: span 2;" onclick="cNum('0')">0</button>
+<button class="calc-btn" onclick="cNum('.')">.</button>
+<button class="calc-btn" onclick="toggleCalc()" style="background: #222;">✕</button>
+
+</div>
+</div><div id="modal-cadastro" class="modal-overlay">
+<h2 style="color:#d4af37">Novo Cliente</h2><input type="text" id="cad-nome" class="input-cadastro" placeholder="Nome">
+<input type="number" id="cad-valor" class="input-cadastro" placeholder="0.00">
+<input type="date" id="cad-data" class="input-cadastro"><button class="btn-gold" style="background: #00ff00;" onclick="salvarNovo()">SALVAR</button>
+
+<p onclick="fecharModal('modal-cadastro')" style="color:#666; margin-top:20px; cursor:pointer;">CANCELAR</p>
+</div><script>
+const PIN = "9656";
+let db = JSON.parse(localStorage.getItem('van_v2_db')) || [];
+
+// LOGIN
+function checarLogin(v){
+if(v === PIN){
+document.getElementById('tela-login').style.display='none';
+document.getElementById('conteudo-privado').style.display='block';
+render();
+}else if(v.length===4){
+const aviso=document.getElementById('aviso-erro');
+const input=document.getElementById('pin-main');
+aviso.style.display='block';
+input.classList.add('shake');
+setTimeout(()=>{
+aviso.style.display='none';
+input.classList.remove('shake');
+input.value="";
+},1500);
+}
+}
+
+// CALCULADORA SEGURA
+let cExp="";
+function toggleCalc(){
+const c=document.getElementById('calc-container');
+c.style.display=(c.style.display==='block')?'none':'block';
+}
+
+function cNum(n){
+cExp+=n;
+document.getElementById('calc-display').innerText=cExp;
+}
+
+function cOp(o){
+if(cExp==="")return;
+cExp+=o;
+document.getElementById('calc-display').innerText=cExp;
+}
+
+function cLimpar(){
+cExp="";
+document.getElementById('calc-display').innerText="0";
+}
+
+function cIgual(){
+try{
+cExp=Function('return '+cExp)().toString();
+document.getElementById('calc-display').innerText=cExp;
+}catch{
+cLimpar();
+}
+}
+
+// MODAL
+function abrirModal(id){
+document.getElementById(id).style.display='flex';
+document.getElementById('cad-data').valueAsDate=new Date();
+}
+
+function fecharModal(id){
+document.getElementById(id).style.display='none';
+}
+
+// SALVAR
+function salvarNovo(){
+const nome=document.getElementById('cad-nome').value.trim();
+const valor=parseFloat(document.getElementById('cad-valor').value);
+const data=document.getElementById('cad-data').value;
+
+if(!nome || isNaN(valor) || valor<=0 || !data) return;
+
+const dI=new Date(data+"T12:00:00");
+const dV=new Date(dI);
+dV.setDate(dI.getDate()+7);
+
+db.push({
+id:Date.now(),
+nome:nome,
+valT:valor*1.4,
+venci:dV.getTime(),
+dia:dV.toLocaleDateString('pt-BR',{weekday:'long'})
+});
+
+localStorage.setItem('van_v2_db',JSON.stringify(db));
+
+// limpar inputs
+document.getElementById('cad-nome').value="";
+document.getElementById('cad-valor').value="";
+
+fecharModal('modal-cadastro');
+render();
+}
+
+// RENDER OTIMIZADO
+function render(){
+const lista=document.getElementById('lista-clientes');
+let html="";
+let total=0;
+const hoje=new Date().setHours(0,0,0,0);
+
+db.sort((a,b)=>a.venci-b.venci).forEach(i=>{
+const diff=Math.ceil((i.venci-hoje)/86400000);
+
+let totalCliente=i.valT;
+if(diff<0) totalCliente+=Math.abs(diff)*40;
+
+total+=totalCliente;
+
+let classe=diff<0?"card-atraso":(diff===0?"card-hoje":"card-ok");
+
+html+=`
+<div class="cliente-card ${classe}">
+<div>
+<span style="font-weight:600; text-transform: uppercase;">${i.nome}</span><br>
+<span style="font-size:26px; font-weight:900;">R$ ${totalCliente.toFixed(2)}</span><br>
+<small style="color:#d4af37;">${i.dia.toUpperCase()}</small>
+</div>
+<div class="acoes-btn">
+<button class="baixa-btn" onclick="darBaixa(${i.id})">BAIXAR</button>
+</div>
+</div>
+`;
+});
+
+lista.innerHTML=html;
+
+document.getElementById('total-rua').innerText=
+"R$ "+total.toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+
+// BAIXAR
+function darBaixa(id){
+const entrada=prompt("PIN:");
+if(entrada===PIN){
+db=db.filter(x=>x.id!==id);
+localStorage.setItem('van_v2_db',JSON.stringify(db));
+render();
+}
+}
+</script></body>
 </html>
