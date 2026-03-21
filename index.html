@@ -87,9 +87,10 @@
         function abrirCadastro() { 
             document.getElementById('modal-wizard').style.display = 'flex'; 
             resetSteps();
-            // Define hoje como padrão no calendário
-            const hoje = new Date().toISOString().split('T')[0];
-            document.getElementById('w-data-manual').value = hoje;
+            const hoje = new Date();
+            const offset = hoje.getTimezoneOffset();
+            const corrigida = new Date(hoje.getTime() - (offset*60*1000));
+            document.getElementById('w-data-manual').value = corrigida.toISOString().split('T')[0];
         }
 
         function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
@@ -110,30 +111,34 @@
         }
 
         function finalizar(dias) {
-            const nome = document.getElementById('w-nome').value;
-            const valor = parseFloat(document.getElementById('w-valor').value);
-            const dataManualStr = document.getElementById('w-data-manual').value;
+            try {
+                const nome = document.getElementById('w-nome').value;
+                const valor = parseFloat(document.getElementById('w-valor').value);
+                const dataManualStr = document.getElementById('w-data-manual').value;
 
-            if(nome && valor && dataManualStr) {
-                // CORREÇÃO DA TRAVA: Desmonta a data para evitar erro de fuso horário
-                const [ano, mes, dia] = dataManualStr.split('-').map(Number);
-                const dataInicio = new Date(ano, mes - 1, dia);
-                dataInicio.setHours(0,0,0,0);
+                if(nome && valor && dataManualStr) {
+                    // RESOLUÇÃO DA TRAVA: Usar substituição de traços por barras para forçar leitura correta
+                    const dataLimpa = dataManualStr.replace(/-/g, '\/');
+                    const dataInicio = new Date(dataLimpa);
+                    dataInicio.setHours(0,0,0,0);
 
-                const dataVenc = new Date(dataInicio);
-                dataVenc.setDate(dataInicio.getDate() + dias);
-                
-                db.push({
-                    id: Date.now(),
-                    nome: nome,
-                    dataCriacao: dataInicio.toLocaleDateString('pt-BR'),
-                    capital: valor,
-                    baseCobrar: valor * 1.40,
-                    venci: dataVenc.getTime(),
-                    venciFormat: dataVenc.toLocaleDateString('pt-BR')
-                });
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                fecharCadastro(); render();
+                    const dataVenc = new Date(dataInicio);
+                    dataVenc.setDate(dataInicio.getDate() + dias);
+                    
+                    db.push({
+                        id: Date.now(),
+                        nome: nome,
+                        dataCriacao: dataInicio.toLocaleDateString('pt-BR'),
+                        capital: valor,
+                        baseCobrar: valor * 1.40,
+                        venci: dataVenc.getTime(),
+                        venciFormat: dataVenc.toLocaleDateString('pt-BR')
+                    });
+                    localStorage.setItem('van_vFinal', JSON.stringify(db));
+                    fecharCadastro(); render();
+                }
+            } catch (e) {
+                alert("Erro ao salvar: Tente selecionar a data novamente.");
             }
         }
 
@@ -142,8 +147,7 @@
             const hojeTs = new Date().setHours(0,0,0,0);
             const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
             let multa = diff < 0 ? Math.abs(diff) * 30 : 0;
-
-            alert(`DETALHES:\n\n👤 Cliente: ${i.nome}\n📅 Data Início: ${i.dataCriacao}\n🏁 Vencimento: ${i.venciFormat}\n💰 Base + Lucro: R$ ${i.baseCobrar.toFixed(2)}\n🚨 Multa: R$ ${multa.toFixed(2)}\n\nTOTAL: R$ ${(i.baseCobrar + multa).toFixed(2)}`);
+            alert(`DETALHES:\n\n👤 Cliente: ${i.nome}\n📅 Início: ${i.dataCriacao}\n🏁 Vencimento: ${i.venciFormat}\n💰 Base + Lucro: R$ ${i.baseCobrar.toFixed(2)}\n🚨 Multa: R$ ${multa.toFixed(2)}\n\nTOTAL: R$ ${(i.baseCobrar + multa).toFixed(2)}`);
         }
 
         function render() {
@@ -152,21 +156,13 @@
             let somaTotal = 0;
             const hojeTs = new Date().setHours(0,0,0,0);
             db.sort((a, b) => a.venci - b.venci);
-
             db.forEach(i => {
                 const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
                 let valorFinal = i.baseCobrar;
                 let multa = 0;
                 let classe = "card-ok", corTxt = "#00ff00", statusTxt = `Faltam ${diff} dias`;
-
-                if(diff === 0) { 
-                    classe = "card-hoje"; corTxt = "#fff"; statusTxt = "VENCE HOJE"; 
-                } else if(diff < 0) {
-                    multa = Math.abs(diff) * 30;
-                    valorFinal = i.baseCobrar + multa;
-                    classe = "card-atraso"; corTxt = "#fff"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`;
-                }
-
+                if(diff === 0) { classe = "card-hoje"; corTxt = "#fff"; statusTxt = "VENCE HOJE"; }
+                else if(diff < 0) { multa = Math.abs(diff) * 30; valorFinal = i.baseCobrar + multa; classe = "card-atraso"; corTxt = "#fff"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`; }
                 somaTotal += valorFinal;
                 lista.innerHTML += `<div class="cliente-card ${classe}">${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}<div><span style="font-weight: 600;">${i.nome}</span><br><span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span><span style="color: ${corTxt}; font-size:12px; font-weight:800;">${statusTxt}</span></div><div class="acoes-btn"><button class="baixa-btn" onclick="remover(${i.id})">BAIXA</button><button class="info-btn" onclick="verInfo(${i.id})">INFO</button></div></div>`;
             });
