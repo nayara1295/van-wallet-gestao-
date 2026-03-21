@@ -28,7 +28,7 @@
         .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
         .valor-receber { font-size: 24px; font-weight: 900; color: #fff; display: block; margin: 2px 0; }
         .txt-multa { color: #ff4d4d; font-size: 11px; font-weight: 900; display: block; margin-top: 2px; }
-        #calc-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #d4af37; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 5px 15px rgba(212,175,55,0.4); z-index: 6000; cursor: pointer; color: #000; font-weight: 900; border: none; }
+        #calc-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #d4af37; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(212,175,55,0.4); z-index: 6000; cursor: pointer; border: none; }
         #calc-container { display: none; position: fixed; bottom: 90px; right: 20px; width: 280px; background: #151515; border: 2px solid #d4af37; border-radius: 20px; padding: 15px; z-index: 6000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         #calc-display { width: 100%; height: 50px; background: #000; border: 1px solid #333; color: #00ff00; font-family: monospace; font-size: 24px; text-align: right; padding: 10px; box-sizing: border-box; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -54,7 +54,19 @@
         <div id="lista-clientes" style="margin-top: 40px;"></div>
     </div>
 
-    <button id="calc-fab" onclick="toggleCalc()">🧮</button>
+    <button id="calc-fab" onclick="toggleCalc()">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 2H5C3.89543 2 3 2.89543 3 4V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V4C21 2.89543 20.1046 2 19 2Z" stroke="#000" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M7 7H17" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M7 12H9" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M15 12H17" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M7 17H9" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M15 17H17" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M11 12H13" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M11 17H13" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+    </button>
+    
     <div id="calc-container">
         <div id="calc-display">0</div>
         <div class="calc-grid">
@@ -132,6 +144,7 @@
         <div class="card-total" style="width: 85%; max-width: 380px; border-color: #00ff00;">
             <h2 style="color:#00ff00;">Baixar Parcela?</h2>
             <p>Confirmar pagamento de:<br><strong id="confirma-nome" style="font-size: 20px; color:#fff;">--</strong></p>
+            <input type="password" id="baixa-pin-confirm" class="input-cadastro" placeholder="PIN DE SEGURANÇA" style="font-size: 18px; border-color: #00ff00;">
             <div style="display: flex; gap: 10px; margin-top: 25px;">
                 <button class="btn-prazo" style="width: 50%; margin:0;" onclick="fecharModal('modal-confirma')">NÃO</button>
                 <button class="btn-gold" id="confirmar-baixa-btn" style="width: 50%; background:#00ff00; margin:0;">SIM</button>
@@ -230,11 +243,17 @@
         function abrirConfirmaBaixa(id) {
             const i = db.find(item => item.id === id);
             document.getElementById('confirma-nome').innerText = i.nome;
+            document.getElementById('baixa-pin-confirm').value = ""; // limpa o pin
             document.getElementById('modal-confirma').style.display = 'flex';
             document.getElementById('confirmar-baixa-btn').onclick = function() {
-                db = db.filter(c => c.id !== id);
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                fecharModal('modal-confirma'); render();
+                const pinInput = document.getElementById('baixa-pin-confirm').value;
+                if(pinInput === PIN_CORRETO) {
+                    db = db.filter(c => c.id !== id);
+                    localStorage.setItem('van_vFinal', JSON.stringify(db));
+                    fecharModal('modal-confirma'); render();
+                } else {
+                    alert("PIN DE SEGURANÇA INCORRETO!");
+                }
             };
         }
         function render() {
@@ -246,25 +265,4 @@
                 let valorFinal = i.baseCobrar; let multa = 0;
                 let classe = "card-ok", st = `Vence em ${diff}d`;
                 if(diff === 0) { classe = "card-hoje"; st = "HOJE"; }
-                else if(diff < 0) { multa = Math.abs(diff) * 40; valorFinal = i.baseCobrar + multa; classe = "card-atraso"; st = `ATRASADO ${Math.abs(diff)}D`; }
-                somaTotal += valorFinal;
-                lista.innerHTML += `
-                    <div class="cliente-card ${classe}">
-                        <div>
-                            <span style="font-weight: 600;">${i.nome}</span><br>
-                            <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span>
-                            <span style="font-size:10px; font-weight:bold; opacity:0.8;">${st}</span>
-                            ${multa > 0 ? `<span class="txt-multa">+ R$ ${multa.toFixed(2)} Multa</span>` : ''}
-                        </div>
-                        <div class="acoes-btn">
-                            <button class="baixa-btn" onclick="abrirConfirmaBaixa(${i.id})">BAIXAR</button>
-                            <button class="edit-btn" onclick="abrirEditar(${i.id})">EDITAR</button>
-                            <button class="info-btn" onclick="verInfo(${i.id})">INFO</button>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        }
-    </script>
-</body>
-</html>
+                else
