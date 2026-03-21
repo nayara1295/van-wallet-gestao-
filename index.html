@@ -1,74 +1,111 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F7FA"
-    android:padding="20dp">
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CARTEIRA VANUBIA - V2</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; background-color: #000; font-family: 'Inter', sans-serif; color: #fff; }
+        #tela-login { position: fixed; inset: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        /* Ajuste do nome para a nova identidade */
+        .logo-login { letter-spacing: 2px; color: #d4af37; font-size: 32px; font-weight: 900; margin-bottom: 30px; text-align: center; }
+        input#pin { padding: 20px; width: 240px; border-radius: 15px; border: 2px solid #d4af37; background: #111; color: #d4af37; font-size: 28px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 8px; display: block; }
+        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; padding-bottom: 80px; }
+        .card-total { background: linear-gradient(145deg, #151515, #050505); padding: 30px; border-radius: 25px; border: 1px solid #222; text-align: center; margin: 20px 0; }
+        .input-cadastro { padding: 18px; width: 85%; border-radius: 12px; border: 2px solid #d4af37; background: #1a1a1a; color: #fff !important; font-size: 20px; text-align: center; outline: none; margin: 15px auto; display: block; }
+        .cliente-card { border-radius: 22px; margin-bottom: 15px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; position: relative; }
+        .card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
+        .card-hoje { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
+        .card-atraso { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .step { display: none; text-align: center; width: 100%; }
+        .step.active { display: block; }
+        .btn-prazo { background: transparent; border: 2px solid #333; color: #666; padding: 12px; width: 70px; border-radius: 10px; margin: 3px; font-weight: 700; cursor: pointer; font-size: 12px; }
+        .btn-prazo.selecionado { border-color: #d4af37; color: #d4af37; background: rgba(212,175,55,0.1); }
+        .acoes-btn { display: flex; flex-direction: column; gap: 5px; min-width: 85px; }
+        .baixa-btn { background: #00ff00; color: #000; border: none; padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .edit-btn { background: #fff; color: #000; border: none; padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .valor-receber { font-size: 24px; font-weight: 900; color: #fff; display: block; margin: 2px 0; }
+        .txt-multa { color: #ff4d4d; font-size: 11px; font-weight: 900; display: block; margin-top: 2px; }
+        #calc-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #d4af37; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 5px 15px rgba(212,175,55,0.4); z-index: 6000; cursor: pointer; color: #000; font-weight: 900; border: none; }
+        #calc-container { display: none; position: fixed; bottom: 90px; right: 20px; width: 280px; background: #151515; border: 2px solid #d4af37; border-radius: 20px; padding: 15px; z-index: 6000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        #calc-display { width: 100%; height: 50px; background: #000; border: 1px solid #333; color: #00ff00; font-family: monospace; font-size: 24px; text-align: right; padding: 10px; box-sizing: border-box; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .calc-btn { padding: 15px; border-radius: 10px; border: none; background: #333; color: #fff; font-weight: bold; cursor: pointer; font-size: 18px; }
+        .calc-btn-op { background: #d4af37; color: #000; }
+        .calc-btn-clear { background: #ff4d4d; color: #fff; grid-column: span 2; }
+    </style>
+</head>
+<body>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/gradient_card"
-        android:padding="25dp"
-        android:elevation="4dp">
+    <div id="tela-login">
+        <div class="logo-login">CARTEIRA VANUBIA</div>
+        <input type="password" id="pin" placeholder="••••••" maxlength="6" inputmode="numeric">
+        <button class="btn-gold" onclick="login()">ACESSAR CONTA</button>
+    </div>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Carteira Vanubia"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+    <div id="conteudo-privado">
+        <div class="card-total">
+            <small style="color: #666; letter-spacing: 2px;">TOTAL A RECEBER</small>
+            <h1 id="total-rua" style="font-size: 42px; margin: 10px 0; color:#d4af37">R$ 0,00</h1>
+        </div>
+        <button class="btn-gold" style="width: 100%;" onclick="abrirCadastro()">+ NOVO EMPRÉSTIMO</button>
+        <div id="lista-clientes" style="margin-top: 40px;"></div>
+    </div>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Gestão de Empréstimos e Finanças"
-            android:textSize="14sp"
-            android:textColor="#E0E0E0"
-            android:layout_marginTop="4dp" />
-    </LinearLayout>
+    <button id="calc-fab" onclick="toggleCalc()">🧮</button>
+    <div id="calc-container">
+        <div id="calc-display">0</div>
+        <div class="calc-grid">
+            <button class="calc-btn calc-btn-clear" onclick="calcClear()">C</button>
+            <button class="calc-btn calc-btn-op" onclick="calcOp('/')">÷</button>
+            <button class="calc-btn calc-btn-op" onclick="calcOp('*')">×</button>
+            <button class="calc-btn" onclick="calcNum('7')">7</button>
+            <button class="calc-btn" onclick="calcNum('8')">8</button>
+            <button class="calc-btn" onclick="calcNum('9')">9</button>
+            <button class="calc-btn calc-btn-op" onclick="calcOp('-')">-</button>
+            <button class="calc-btn" onclick="calcNum('4')">4</button>
+            <button class="calc-btn" onclick="calcNum('5')">5</button>
+            <button class="calc-btn" onclick="calcNum('6')">6</button>
+            <button class="calc-btn calc-btn-op" onclick="calcOp('+')">+</button>
+            <button class="calc-btn" onclick="calcNum('1')">1</button>
+            <button class="calc-btn" onclick="calcNum('2')">2</button>
+            <button class="calc-btn" onclick="calcNum('3')">3</button>
+            <button class="calc-btn calc-btn-op" onclick="calcEqual()">=</button>
+            <button class="calc-btn" style="grid-column: span 2;" onclick="calcNum('0')">0</button>
+            <button class="calc-btn" onclick="calcNum('.')">.</button>
+            <button class="calc-btn" onclick="toggleCalc()" style="background: #222;">✖</button>
+        </div>
+    </div>
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:cardCornerRadius="12dp">
+    <div id="modal-wizard" class="modal-overlay">
+        <div id="step-1" class="step active">
+            <h2 style="color:#d4af37">Nome do Cliente</h2>
+            <input type="text" id="w-nome" class="input-cadastro" placeholder="Nome completo">
+            <button class="btn-gold" onclick="nextStep(2)">PRÓXIMO</button>
+            <p onclick="fecharCadastro()" style="color:#666; margin-top:30px; cursor:pointer;">Sair</p>
+        </div>
+        <div id="step-2" class="step">
+            <h2 style="color:#d4af37">Valor do Empréstimo</h2>
+            <input type="number" id="w-valor" class="input-cadastro" placeholder="0,00" inputmode="decimal">
+            <button class="btn-gold" onclick="nextStep(3)">PRÓXIMO</button>
+        </div>
+        <div id="step-3" class="step">
+            <h2 id="nome-final" style="color:#d4af37"></h2>
+            <p style="color:#666; font-size: 14px;">Data de Emissão:</p>
+            <input type="date" id="w-data-manual" class="input-cadastro">
+            <p>Escolha o Prazo:</p>
+            <div style="margin-bottom: 25px;">
+                <button id="p7" class="btn-prazo" onclick="selecionarPrazo(7)">7 D</button>
+                <button id="p15" class="btn-prazo" onclick="selecionarPrazo(15)">15 D</button>
+                <button id="p30" class="btn-prazo" onclick="selecionarPrazo(30)">30 D</button>
+            </div>
+            <button class="btn-gold" style="background: #d4af37;" onclick="finalizarCadastro()">SALVAR AGORA</button>
+        </div>
+    </div>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Saldo Total"
-                android:textColor="#757575" />
-
-            <TextView
-                android:id="@+id/txt_saldo_total"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="R$ 0,00"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:textColor="#2E7D32" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <Button
-        android:id="@+id/btn_novo_cliente"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginTop="30dp"
-        android:text="Novo Empréstimo"
-        android:backgroundTint="#4A148C"
-        android:textColor="#FFFFFF"
-        android:textAllCaps="false"
-        android:textSize="16sp" />
-
-</LinearLayout>
+    <div id="modal-editar" class="modal-overlay">
+        <div class="card-total" style="width: 85%; max-width: 380px; border-color: #fff;">
+            <h2 style="color:#fff;">Abater / Editar</h2>
