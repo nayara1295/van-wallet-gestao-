@@ -21,7 +21,8 @@
         #modal-wizard { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; flex-direction: column; align-items: center; justify-content: center; }
         .step { display: none; text-align: center; width: 100%; }
         .step.active { display: block; }
-        .btn-prazo { background: transparent; border: 2px solid #d4af37; color: #d4af37; padding: 15px; width: 80px; border-radius: 12px; margin: 5px; font-weight: 700; cursor: pointer; }
+        .btn-prazo { background: transparent; border: 2px solid #444; color: #888; padding: 15px; width: 80px; border-radius: 12px; margin: 5px; font-weight: 700; cursor: pointer; }
+        .btn-prazo.selecionado { border-color: #d4af37; color: #d4af37; background: rgba(212, 175, 55, 0.1); }
         .acoes-btn { display: flex; flex-direction: column; gap: 8px; }
         .baixa-btn { background: #fff; color: #000; border: none; padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
         .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
@@ -60,21 +61,25 @@
 
         <div id="step-3" class="step">
             <h2 id="nome-final" style="color:#d4af37"></h2>
-            <p style="color:#666; font-size: 14px;">1. Selecione a Data (se for antigo):</p>
-            <input type="date" id="w-data-manual" class="input-cadastro" style="font-size: 16px; padding: 12px; border-color: #444; margin-bottom: 20px;">
             
-            <p>2. Clique no Prazo para Finalizar:</p>
-            <div style="margin-bottom: 20px;">
-                <button class="btn-prazo" onclick="finalizar(7)">7 D</button>
-                <button class="btn-prazo" onclick="finalizar(15)">15 D</button>
-                <button class="btn-prazo" onclick="finalizar(30)">30 D</button>
+            <p style="color:#666; font-size: 14px;">Data do Empréstimo:</p>
+            <input type="date" id="w-data-manual" class="input-cadastro" style="font-size: 16px; padding: 12px; border-color: #444;">
+
+            <p>Escolha o Prazo:</p>
+            <div style="margin-bottom: 25px;">
+                <button id="p7" class="btn-prazo" onclick="selecionarPrazo(7)">7 D</button>
+                <button id="p15" class="btn-prazo" onclick="selecionarPrazo(15)">15 D</button>
+                <button id="p30" class="btn-prazo" onclick="selecionarPrazo(30)">30 D</button>
             </div>
+            
+            <button class="btn-gold" id="btn-salvar" style="background: #d4af37; color: #000;" onclick="finalizar()">SALVAR EMPRÉSTIMO</button>
         </div>
     </div>
 
     <script>
         const PIN_CORRETO = "102030";
         let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
+        let prazoSelecionado = 7; // Padrão é 7 dias
 
         function login() {
             if(document.getElementById('pin').value === PIN_CORRETO) {
@@ -92,6 +97,7 @@
             const mes = String(hoje.getMonth() + 1).padStart(2, '0');
             const dia = String(hoje.getDate()).padStart(2, '0');
             document.getElementById('w-data-manual').value = `${ano}-${mes}-${dia}`;
+            selecionarPrazo(7);
         }
 
         function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
@@ -111,19 +117,24 @@
             document.getElementById('w-valor').value = "";
         }
 
-        function finalizar(dias) {
+        function selecionarPrazo(d) {
+            prazoSelecionado = d;
+            document.querySelectorAll('.btn-prazo').forEach(b => b.classList.remove('selecionado'));
+            document.getElementById('p' + d).classList.add('selecionado');
+        }
+
+        function finalizar() {
             const nome = document.getElementById('w-nome').value;
             const valor = parseFloat(document.getElementById('w-valor').value);
             const dataManualStr = document.getElementById('w-data-manual').value;
 
             if(nome && valor && dataManualStr) {
-                // AQUI ESTÁ A SOLUÇÃO: Desmontar a data para não travar
                 const partes = dataManualStr.split('-');
                 const dataInicio = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
                 dataInicio.setHours(0,0,0,0);
 
                 const dataVenc = new Date(dataInicio);
-                dataVenc.setDate(dataInicio.getDate() + dias);
+                dataVenc.setDate(dataInicio.getDate() + prazoSelecionado);
                 
                 db.push({
                     id: Date.now(),
@@ -138,6 +149,8 @@
                 localStorage.setItem('van_vFinal', JSON.stringify(db));
                 fecharCadastro(); 
                 render();
+            } else {
+                alert("Preencha todos os campos corretamente.");
             }
         }
 
@@ -146,7 +159,7 @@
             const hojeTs = new Date().setHours(0,0,0,0);
             const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
             let multa = diff < 0 ? Math.abs(diff) * 30 : 0;
-            alert(`DETALHES:\n\n👤 Cliente: ${i.nome}\n📅 Início: ${i.dataCriacao}\n🏁 Vencimento: ${i.venciFormat}\n💰 Base + Lucro: R$ ${i.baseCobrar.toFixed(2)}\n🚨 Multa: R$ ${multa.toFixed(2)}\n\nTOTAL: R$ ${(i.baseCobrar + multa).toFixed(2)}`);
+            alert(`DETALHES:\n👤 Cliente: ${i.nome}\n📅 Início: ${i.dataCriacao}\n🏁 Vencimento: ${i.venciFormat}\n💰 Valor: R$ ${i.baseCobrar.toFixed(2)}\n🚨 Multa: R$ ${multa.toFixed(2)}`);
         }
 
         function render() {
@@ -160,18 +173,16 @@
                 const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
                 let valorFinal = i.baseCobrar;
                 let multa = 0;
-                let classe = "card-ok", corTxt = "#00ff00", statusTxt = `Faltam ${diff} dias`;
+                let classe = "card-ok", statusTxt = `Faltam ${diff} dias`;
 
-                if(diff === 0) { 
-                    classe = "card-hoje"; corTxt = "#fff"; statusTxt = "VENCE HOJE"; 
-                } else if(diff < 0) {
+                if(diff === 0) { classe = "card-hoje"; statusTxt = "VENCE HOJE"; }
+                else if(diff < 0) {
                     multa = Math.abs(diff) * 30;
                     valorFinal = i.baseCobrar + multa;
-                    classe = "card-atraso"; corTxt = "#fff"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`;
+                    classe = "card-atraso"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`;
                 }
-
                 somaTotal += valorFinal;
-                lista.innerHTML += `<div class="cliente-card ${classe}">${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}<div><span style="font-weight: 600;">${i.nome}</span><br><span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span><span style="color: ${corTxt}; font-size:12px; font-weight:800;">${statusTxt}</span></div><div class="acoes-btn"><button class="baixa-btn" onclick="remover(${i.id})">BAIXA</button><button class="info-btn" onclick="verInfo(${i.id})">INFO</button></div></div>`;
+                lista.innerHTML += `<div class="cliente-card ${classe}">${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}<div><span style="font-weight: 600;">${i.nome}</span><br><span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span><span style="font-size:12px;">${statusTxt}</span></div><div class="acoes-btn"><button class="baixa-btn" onclick="remover(${i.id})">BAIXA</button><button class="info-btn" onclick="verInfo(${i.id})">INFO</button></div></div>`;
             });
             document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         }
