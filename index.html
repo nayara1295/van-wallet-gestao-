@@ -6,187 +6,28 @@
     <title>VAN WALLET</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
+        
+        /* LOGIN */
         #tela-login { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
         input#pin { padding: 20px; width: 260px; border-radius: 15px; border: 2px solid #333; background: #111; color: #d4af37; font-size: 24px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 10px; }
-        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        
+        /* BOTÕES E CARDS */
+        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-gold:active { transform: scale(0.95); }
         #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; }
         .card-total { background: linear-gradient(145deg, #151515, #050505); padding: 30px; border-radius: 25px; border: 1px solid #222; text-align: center; margin: 20px 0; }
+        
+        /* FORMULÁRIO */
         .input-cadastro { padding: 18px; width: 85%; border-radius: 12px; border: 2px solid #d4af37; background: #1a1a1a; color: #fff !important; font-size: 20px; text-align: center; outline: none; margin: 15px auto; display: block; }
+        
+        /* LISTA DE CLIENTES */
         .cliente-card { border-radius: 22px; margin-bottom: 15px; padding: 22px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; position: relative; }
         .card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
         .card-hoje { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
         .card-atraso { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; }
         .valor-receber { font-size: 26px; font-weight: 900; color: #fff; display: block; margin: 5px 0; }
         .multa-alerta { font-size: 10px; background: #ff4d4d; color: #fff; padding: 4px 10px; border-radius: 20px; font-weight: bold; position: absolute; top: 15px; right: 15px; }
-        #modal-wizard { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; flex-direction: column; align-items: center; justify-content: center; }
-        .step { display: none; text-align: center; width: 100%; }
-        .step.active { display: block; }
-        .btn-prazo { background: transparent; border: 2px solid #444; color: #888; padding: 15px; width: 80px; border-radius: 12px; margin: 5px; font-weight: 700; cursor: pointer; }
-        .btn-prazo.selecionado { border-color: #d4af37; color: #d4af37; background: rgba(212, 175, 55, 0.1); }
-        .acoes-btn { display: flex; flex-direction: column; gap: 8px; }
-        .baixa-btn { background: #fff; color: #000; border: none; padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
-    </style>
-</head>
-<body>
-
-    <div id="tela-login">
-        <h1 style="letter-spacing: 5px; color:#fff;">VAN WALLET</h1>
-        <input type="password" id="pin" placeholder="PIN" maxlength="6">
-        <button class="btn-gold" onclick="login()">ACESSAR</button>
-    </div>
-
-    <div id="conteudo-privado">
-        <div class="card-total">
-            <small style="color: #666; letter-spacing: 2px;">TOTAL A RECEBER</small>
-            <h1 id="total-rua" style="font-size: 42px; margin: 10px 0; color:#d4af37">R$ 0,00</h1>
-        </div>
-        <button class="btn-gold" style="width: 100%;" onclick="abrirCadastro()">+ NOVO EMPRÉSTIMO</button>
-        <div id="lista-clientes" style="margin-top: 40px;"></div>
-    </div>
-
-    <div id="modal-wizard">
-        <div id="step-1" class="step active">
-            <h2>Nome do Cliente</h2>
-            <input type="text" id="w-nome" class="input-cadastro" placeholder="Nome...">
-            <br><button class="btn-gold" onclick="nextStep(2)">PRÓXIMO</button>
-            <p onclick="fecharCadastro()" style="color:#666; margin-top:30px; cursor:pointer;">Cancelar</p>
-        </div>
         
-        <div id="step-2" class="step">
-            <h2>Valor do Empréstimo</h2>
-            <input type="number" id="w-valor" class="input-cadastro" placeholder="R$ 0,00">
-            <br><button class="btn-gold" onclick="nextStep(3)">PRÓXIMO</button>
-        </div>
-
-        <div id="step-3" class="step">
-            <h2 id="nome-final" style="color:#d4af37"></h2>
-            
-            <p style="color:#666; font-size: 14px;">Data do Empréstimo:</p>
-            <input type="date" id="w-data-manual" class="input-cadastro" style="font-size: 16px; padding: 12px; border-color: #444;">
-
-            <p>Escolha o Prazo:</p>
-            <div style="margin-bottom: 25px;">
-                <button id="p7" class="btn-prazo" onclick="selecionarPrazo(7)">7 D</button>
-                <button id="p15" class="btn-prazo" onclick="selecionarPrazo(15)">15 D</button>
-                <button id="p30" class="btn-prazo" onclick="selecionarPrazo(30)">30 D</button>
-            </div>
-            
-            <button class="btn-gold" id="btn-salvar" style="background: #d4af37; color: #000;" onclick="finalizar()">SALVAR EMPRÉSTIMO</button>
-        </div>
-    </div>
-
-    <script>
-        const PIN_CORRETO = "102030";
-        let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
-        let prazoSelecionado = 7; // Padrão é 7 dias
-
-        function login() {
-            if(document.getElementById('pin').value === PIN_CORRETO) {
-                document.getElementById('tela-login').style.display = 'none';
-                document.getElementById('conteudo-privado').style.display = 'block';
-                render();
-            } else { alert("PIN INVÁLIDO"); }
-        }
-
-        function abrirCadastro() { 
-            document.getElementById('modal-wizard').style.display = 'flex'; 
-            resetSteps();
-            const hoje = new Date();
-            const ano = hoje.getFullYear();
-            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-            const dia = String(hoje.getDate()).padStart(2, '0');
-            document.getElementById('w-data-manual').value = `${ano}-${mes}-${dia}`;
-            selecionarPrazo(7);
-        }
-
-        function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
-        
-        function nextStep(n) {
-            if(n === 2 && document.getElementById('w-nome').value === "") return;
-            if(n === 3 && document.getElementById('w-valor').value === "") return;
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('step-' + n).classList.add('active');
-            if(n === 3) document.getElementById('nome-final').innerText = document.getElementById('w-nome').value;
-        }
-
-        function resetSteps() {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('step-1').classList.add('active');
-            document.getElementById('w-nome').value = "";
-            document.getElementById('w-valor').value = "";
-        }
-
-        function selecionarPrazo(d) {
-            prazoSelecionado = d;
-            document.querySelectorAll('.btn-prazo').forEach(b => b.classList.remove('selecionado'));
-            document.getElementById('p' + d).classList.add('selecionado');
-        }
-
-        function finalizar() {
-            const nome = document.getElementById('w-nome').value;
-            const valor = parseFloat(document.getElementById('w-valor').value);
-            const dataManualStr = document.getElementById('w-data-manual').value;
-
-            if(nome && valor && dataManualStr) {
-                const partes = dataManualStr.split('-');
-                const dataInicio = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
-                dataInicio.setHours(0,0,0,0);
-
-                const dataVenc = new Date(dataInicio);
-                dataVenc.setDate(dataInicio.getDate() + prazoSelecionado);
-                
-                db.push({
-                    id: Date.now(),
-                    nome: nome,
-                    dataCriacao: dataInicio.toLocaleDateString('pt-BR'),
-                    capital: valor,
-                    baseCobrar: valor * 1.40,
-                    venci: dataVenc.getTime(),
-                    venciFormat: dataVenc.toLocaleDateString('pt-BR')
-                });
-                
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                fecharCadastro(); 
-                render();
-            } else {
-                alert("Preencha todos os campos corretamente.");
-            }
-        }
-
-        function verInfo(id) {
-            const i = db.find(item => item.id === id);
-            const hojeTs = new Date().setHours(0,0,0,0);
-            const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
-            let multa = diff < 0 ? Math.abs(diff) * 30 : 0;
-            alert(`DETALHES:\n👤 Cliente: ${i.nome}\n📅 Início: ${i.dataCriacao}\n🏁 Vencimento: ${i.venciFormat}\n💰 Valor: R$ ${i.baseCobrar.toFixed(2)}\n🚨 Multa: R$ ${multa.toFixed(2)}`);
-        }
-
-        function render() {
-            const lista = document.getElementById('lista-clientes');
-            lista.innerHTML = "";
-            let somaTotal = 0;
-            const hojeTs = new Date().setHours(0,0,0,0);
-            db.sort((a, b) => a.venci - b.venci);
-
-            db.forEach(i => {
-                const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
-                let valorFinal = i.baseCobrar;
-                let multa = 0;
-                let classe = "card-ok", statusTxt = `Faltam ${diff} dias`;
-
-                if(diff === 0) { classe = "card-hoje"; statusTxt = "VENCE HOJE"; }
-                else if(diff < 0) {
-                    multa = Math.abs(diff) * 30;
-                    valorFinal = i.baseCobrar + multa;
-                    classe = "card-atraso"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`;
-                }
-                somaTotal += valorFinal;
-                lista.innerHTML += `<div class="cliente-card ${classe}">${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}<div><span style="font-weight: 600;">${i.nome}</span><br><span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span><span style="font-size:12px;">${statusTxt}</span></div><div class="acoes-btn"><button class="baixa-btn" onclick="remover(${i.id})">BAIXA</button><button class="info-btn" onclick="verInfo(${i.id})">INFO</button></div></div>`;
-            });
-            document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        }
-        function remover(id) { if(confirm("Confirmar recebimento?")) { db = db.filter(c => c.id !== id); localStorage.setItem('van_vFinal', JSON.stringify(db)); render(); } }
-    </script>
-</body>
-</html>
+        /* MODAIS (JANELAS) */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .step { display: none;
