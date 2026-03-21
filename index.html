@@ -27,7 +27,7 @@
         .edit-btn { background: #fff; color: #000; border: none; padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
         .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
         .valor-receber { font-size: 24px; font-weight: 900; color: #fff; display: block; margin: 2px 0; }
-        .multa-alerta { font-size: 9px; background: #ff4d4d; color: #fff; padding: 3px 8px; border-radius: 20px; font-weight: bold; position: absolute; top: 12px; right: 12px; }
+        .txt-multa { color: #ff4d4d; font-size: 11px; font-weight: 900; display: block; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -76,7 +76,6 @@
     <div id="modal-editar" class="modal-overlay">
         <div class="card-total" style="width: 85%; max-width: 380px; border-color: #fff;">
             <h2 style="color:#fff;">Abater / Editar</h2>
-            <p style="color:#ccc; font-size: 12px;">Digite o NOVO TOTAL que o cliente deve (já com os juros):</p>
             <input type="text" id="edit-nome" class="input-cadastro" style="font-size: 16px;">
             <input type="number" id="edit-valor-total" class="input-cadastro" style="font-size: 24px; color:#00ff00 !important;" placeholder="R$ 0,00">
             <div style="display: flex; gap: 10px; margin-top: 20px;">
@@ -90,9 +89,9 @@
         <div class="card-total" style="width: 85%; max-width: 380px; text-align: left; border-color: #d4af37;">
             <h2 id="info-nome" style="color:#d4af37; margin-top: 0;">--</h2>
             <p style="color:#ccc;">Vencimento: <strong id="info-venc" style="color:#fff;">--</strong></p>
-            <p style="color:#ff4d4d;">Multa: R$ <span id="info-multa">0,00</span></p>
+            <p style="color:#ff4d4d; font-weight: bold;">Multa (R$ 40/dia): R$ <span id="info-multa">0,00</span></p>
             <hr style="border: 0; border-top: 1px solid #222;">
-            <p style="font-size: 18px;">VALOR ATUALIZADO:<br><span style="color: #00ff00; font-size: 32px; font-weight: 900;">R$ <span id="info-total">0,00</span></span></p>
+            <p style="font-size: 18px;">TOTAL ATUALIZADO:<br><span style="color: #00ff00; font-size: 32px; font-weight: 900;">R$ <span id="info-total">0,00</span></span></p>
             <button class="btn-gold" style="width: 100%; margin-top: 15px;" onclick="fecharModal('modal-info')">VOLTAR</button>
         </div>
     </div>
@@ -113,21 +112,8 @@
         let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
         let prazoSelecionado = 7;
 
-        function login() {
-            if(document.getElementById('pin').value === PIN_CORRETO) {
-                document.getElementById('tela-login').style.display = 'none';
-                document.getElementById('conteudo-privado').style.display = 'block';
-                render();
-            }
-        }
-
-        function abrirCadastro() { 
-            document.getElementById('modal-wizard').style.display = 'flex'; 
-            resetSteps();
-            document.getElementById('w-data-manual').value = new Date().toISOString().split('T')[0];
-            selecionarPrazo(7);
-        }
-
+        function login() { if(document.getElementById('pin').value === PIN_CORRETO) { document.getElementById('tela-login').style.display = 'none'; document.getElementById('conteudo-privado').style.display = 'block'; render(); } }
+        function abrirCadastro() { document.getElementById('modal-wizard').style.display = 'flex'; resetSteps(); document.getElementById('w-data-manual').value = new Date().toISOString().split('T')[0]; selecionarPrazo(7); }
         function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
         function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -142,8 +128,7 @@
         function resetSteps() {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-1').classList.add('active');
-            document.getElementById('w-nome').value = "";
-            document.getElementById('w-valor').value = "";
+            document.getElementById('w-nome').value = ""; document.getElementById('w-valor').value = "";
         }
 
         function selecionarPrazo(d) {
@@ -160,7 +145,6 @@
                 const p = dataStr.split('-');
                 const dI = new Date(p[0], p[1]-1, p[2]); dI.setHours(0,0,0,0);
                 const dV = new Date(dI); dV.setDate(dI.getDate() + prazoSelecionado);
-                // No cadastro inicial, aplica-se os 40%
                 db.push({ id: Date.now(), nome, baseCobrar: valor * 1.4, venci: dV.getTime(), venciFormat: dV.toLocaleDateString('pt-BR') });
                 localStorage.setItem('van_vFinal', JSON.stringify(db));
                 fecharCadastro(); render();
@@ -172,10 +156,8 @@
             document.getElementById('edit-nome').value = i.nome;
             document.getElementById('edit-valor-total').value = i.baseCobrar.toFixed(2);
             document.getElementById('modal-editar').style.display = 'flex';
-            
             document.getElementById('btn-salvar-edit').onclick = function() {
                 i.nome = document.getElementById('edit-nome').value;
-                // Ao editar, o valor digitado entra DIRETO no card principal (abatimento concluído)
                 i.baseCobrar = parseFloat(document.getElementById('edit-valor-total').value);
                 localStorage.setItem('van_vFinal', JSON.stringify(db));
                 fecharModal('modal-editar'); render();
@@ -186,7 +168,7 @@
             const i = db.find(item => item.id === id);
             const hojeTs = new Date().setHours(0,0,0,0);
             const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
-            let multa = diff < 0 ? Math.abs(diff) * 30 : 0;
+            let multa = diff < 0 ? Math.abs(diff) * 40 : 0;
             document.getElementById('info-nome').innerText = i.nome;
             document.getElementById('info-venc').innerText = i.venciFormat;
             document.getElementById('info-multa').innerText = multa.toFixed(2);
@@ -214,9 +196,26 @@
                 let valorFinal = i.baseCobrar; let multa = 0;
                 let classe = "card-ok", st = `Vence em ${diff}d`;
                 if(diff === 0) { classe = "card-hoje"; st = "HOJE"; }
-                else if(diff < 0) { multa = Math.abs(diff) * 30; valorFinal = i.baseCobrar + multa; classe = "card-atraso"; st = `ATRASADO ${Math.abs(diff)}D`; }
+                else if(diff < 0) { 
+                    multa = Math.abs(diff) * 40; 
+                    valorFinal = i.baseCobrar + multa; 
+                    classe = "card-atraso"; st = `ATRASADO ${Math.abs(diff)}D`; 
+                }
                 somaTotal += valorFinal;
-                lista.innerHTML += `<div class="cliente-card ${classe}">${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}<div><span style="font-weight: 600;">${i.nome}</span><br><span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span><span style="font-size:10px; font-weight:bold; opacity:0.8;">${st}</span></div><div class="acoes-btn"><button class="baixa-btn" onclick="abrirConfirmaBaixa(${i.id})">BAIXAR</button><button class="edit-btn" onclick="abrirEditar(${i.id})">EDITAR</button><button class="info-btn" onclick="verInfo(${i.id})">INFO</button></div></div>`;
+                lista.innerHTML += `
+                    <div class="cliente-card ${classe}">
+                        <div>
+                            <span style="font-weight: 600;">${i.nome}</span><br>
+                            <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span>
+                            <span style="font-size:10px; font-weight:bold; opacity:0.8;">${st}</span>
+                            ${multa > 0 ? `<span class="txt-multa">+ R$ ${multa.toFixed(2)} Multa</span>` : ''}
+                        </div>
+                        <div class="acoes-btn">
+                            <button class="baixa-btn" onclick="abrirConfirmaBaixa(${i.id})">BAIXAR</button>
+                            <button class="edit-btn" onclick="abrirEditar(${i.id})">EDITAR</button>
+                            <button class="info-btn" onclick="verInfo(${i.id})">INFO</button>
+                        </div>
+                    </div>`;
             });
             document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         }
