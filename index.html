@@ -7,7 +7,6 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background-color: #000; font-family: 'Inter', sans-serif; color: #fff; }
         #tela-login { position: fixed; inset: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-        /* Ajuste do nome para a nova identidade */
         .logo-login { letter-spacing: 2px; color: #d4af37; font-size: 32px; font-weight: 900; margin-bottom: 30px; text-align: center; }
         input#pin { padding: 20px; width: 240px; border-radius: 15px; border: 2px solid #d4af37; background: #111; color: #d4af37; font-size: 28px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 8px; display: block; }
         .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
@@ -109,3 +108,163 @@
     <div id="modal-editar" class="modal-overlay">
         <div class="card-total" style="width: 85%; max-width: 380px; border-color: #fff;">
             <h2 style="color:#fff;">Abater / Editar</h2>
+            <input type="text" id="edit-nome" class="input-cadastro" style="font-size: 16px;">
+            <input type="number" id="edit-valor-total" class="input-cadastro" style="font-size: 24px; color:#00ff00 !important;" placeholder="R$ 0,00">
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn-prazo" style="width: 50%; margin:0;" onclick="fecharModal('modal-editar')">CANCELAR</button>
+                <button class="btn-gold" id="btn-salvar-edit" style="width: 50%; background:#00ff00; color:#000; margin:0;">SALVAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-info" class="modal-overlay">
+        <div class="card-total" style="width: 85%; max-width: 380px; text-align: left; border-color: #d4af37;">
+            <h2 id="info-nome" style="color:#d4af37; margin-top: 0;">--</h2>
+            <p style="color:#ccc;">Vencimento: <strong id="info-venc" style="color:#fff;">--</strong></p>
+            <p style="color:#ff4d4d; font-weight: bold;">Multa (R$ 40/dia): R$ <span id="info-multa">0,00</span></p>
+            <hr style="border: 0; border-top: 1px solid #222;">
+            <p style="font-size: 18px;">TOTAL ATUALIZADO:<br><span style="color: #00ff00; font-size: 32px; font-weight: 900;">R$ <span id="info-total">0,00</span></span></p>
+            <button class="btn-gold" style="width: 100%; margin-top: 15px;" onclick="fecharModal('modal-info')">VOLTAR</button>
+        </div>
+    </div>
+
+    <div id="modal-confirma" class="modal-overlay">
+        <div class="card-total" style="width: 85%; max-width: 380px; border-color: #00ff00;">
+            <h2 style="color:#00ff00;">Baixar Parcela?</h2>
+            <p>Confirmar pagamento de:<br><strong id="confirma-nome" style="font-size: 20px; color:#fff;">--</strong></p>
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button class="btn-prazo" style="width: 50%; margin:0;" onclick="fecharModal('modal-confirma')">NÃO</button>
+                <button class="btn-gold" id="confirmar-baixa-btn" style="width: 50%; background:#00ff00; margin:0;">SIM</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PIN_CORRETO = "102030";
+        let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
+        let prazoSelecionado = 7;
+
+        function login() { 
+            const pinDigitado = document.getElementById('pin').value;
+            if(pinDigitado === PIN_CORRETO) { 
+                document.getElementById('tela-login').style.display = 'none'; 
+                document.getElementById('conteudo-privado').style.display = 'block'; 
+                render(); 
+            } else {
+                alert("PIN INCORRETO!");
+            }
+        }
+        
+        let calcExpressao = "";
+        function toggleCalc() {
+            const c = document.getElementById('calc-container');
+            c.style.display = c.style.display === 'block' ? 'none' : 'block';
+        }
+        function calcNum(n) { calcExpressao += n; document.getElementById('calc-display').innerText = calcExpressao; }
+        function calcOp(op) { calcExpressao += op; document.getElementById('calc-display').innerText = calcExpressao; }
+        function calcClear() { calcExpressao = ""; document.getElementById('calc-display').innerText = "0"; }
+        function calcEqual() {
+            try {
+                let res = eval(calcExpressao);
+                calcExpressao = res.toString();
+                document.getElementById('calc-display').innerText = calcExpressao;
+            } catch(e) { document.getElementById('calc-display').innerText = "Erro"; calcExpressao = ""; }
+        }
+
+        function abrirCadastro() { document.getElementById('modal-wizard').style.display = 'flex'; resetSteps(); document.getElementById('w-data-manual').value = new Date().toISOString().split('T')[0]; selecionarPrazo(7); }
+        function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
+        function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+        function nextStep(n) {
+            if(n === 2 && document.getElementById('w-nome').value === "") return;
+            if(n === 3 && document.getElementById('w-valor').value === "") return;
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-' + n).classList.add('active');
+            if(n === 3) document.getElementById('nome-final').innerText = document.getElementById('w-nome').value;
+        }
+        function resetSteps() {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-1').classList.add('active');
+            document.getElementById('w-nome').value = ""; document.getElementById('w-valor').value = "";
+        }
+        function selecionarPrazo(d) {
+            prazoSelecionado = d;
+            document.querySelectorAll('.btn-prazo').forEach(b => b.classList.remove('selecionado'));
+            document.getElementById('p' + d).classList.add('selecionado');
+        }
+        function finalizarCadastro() {
+            const nome = document.getElementById('w-nome').value;
+            const valor = parseFloat(document.getElementById('w-valor').value);
+            const dataStr = document.getElementById('w-data-manual').value;
+            if(nome && valor && dataStr) {
+                const p = dataStr.split('-');
+                const dI = new Date(p[0], p[1]-1, p[2]); dI.setHours(0,0,0,0);
+                const dV = new Date(dI); dV.setDate(dI.getDate() + prazoSelecionado);
+                db.push({ id: Date.now(), nome, baseCobrar: valor * 1.4, venci: dV.getTime(), venciFormat: dV.toLocaleDateString('pt-BR') });
+                localStorage.setItem('van_vFinal', JSON.stringify(db));
+                fecharCadastro(); render();
+            }
+        }
+        function abrirEditar(id) {
+            const i = db.find(item => item.id === id);
+            document.getElementById('edit-nome').value = i.nome;
+            document.getElementById('edit-valor-total').value = i.baseCobrar.toFixed(2);
+            document.getElementById('modal-editar').style.display = 'flex';
+            document.getElementById('btn-salvar-edit').onclick = function() {
+                i.nome = document.getElementById('edit-nome').value;
+                i.baseCobrar = parseFloat(document.getElementById('edit-valor-total').value);
+                localStorage.setItem('van_vFinal', JSON.stringify(db));
+                fecharModal('modal-editar'); render();
+            };
+        }
+        function verInfo(id) {
+            const i = db.find(item => item.id === id);
+            const hojeTs = new Date().setHours(0,0,0,0);
+            const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
+            let multa = diff < 0 ? Math.abs(diff) * 40 : 0;
+            document.getElementById('info-nome').innerText = i.nome;
+            document.getElementById('info-venc').innerText = i.venciFormat;
+            document.getElementById('info-multa').innerText = multa.toFixed(2);
+            document.getElementById('info-total').innerText = (i.baseCobrar + multa).toFixed(2);
+            document.getElementById('modal-info').style.display = 'flex';
+        }
+        function abrirConfirmaBaixa(id) {
+            const i = db.find(item => item.id === id);
+            document.getElementById('confirma-nome').innerText = i.nome;
+            document.getElementById('modal-confirma').style.display = 'flex';
+            document.getElementById('confirmar-baixa-btn').onclick = function() {
+                db = db.filter(c => c.id !== id);
+                localStorage.setItem('van_vFinal', JSON.stringify(db));
+                fecharModal('modal-confirma'); render();
+            };
+        }
+        function render() {
+            const lista = document.getElementById('lista-clientes'); lista.innerHTML = "";
+            let somaTotal = 0; const hojeTs = new Date().setHours(0,0,0,0);
+            db.sort((a, b) => a.venci - b.venci);
+            db.forEach(i => {
+                const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
+                let valorFinal = i.baseCobrar; let multa = 0;
+                let classe = "card-ok", st = `Vence em ${diff}d`;
+                if(diff === 0) { classe = "card-hoje"; st = "HOJE"; }
+                else if(diff < 0) { multa = Math.abs(diff) * 40; valorFinal = i.baseCobrar + multa; classe = "card-atraso"; st = `ATRASADO ${Math.abs(diff)}D`; }
+                somaTotal += valorFinal;
+                lista.innerHTML += `
+                    <div class="cliente-card ${classe}">
+                        <div>
+                            <span style="font-weight: 600;">${i.nome}</span><br>
+                            <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span>
+                            <span style="font-size:10px; font-weight:bold; opacity:0.8;">${st}</span>
+                            ${multa > 0 ? `<span class="txt-multa">+ R$ ${multa.toFixed(2)} Multa</span>` : ''}
+                        </div>
+                        <div class="acoes-btn">
+                            <button class="baixa-btn" onclick="abrirConfirmaBaixa(${i.id})">BAIXAR</button>
+                            <button class="edit-btn" onclick="abrirEditar(${i.id})">EDITAR</button>
+                            <button class="info-btn" onclick="verInfo(${i.id})">INFO</button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        }
+    </script>
+</body>
+</html>
