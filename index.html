@@ -3,53 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VAN WALLET - OFICIAL</title>
+    <title>VAN WALLET - V2 PREMIUM</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background-color: #000; font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
+        
+        /* ALERTA PERSONALIZADO (SUBSTITUI O ALERT DO SISTEMA) */
+        #aviso-erro {
+            display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #ff4d4d; color: #000; padding: 15px 30px; border-radius: 15px;
+            font-weight: 900; z-index: 11000; box-shadow: 0 10px 30px rgba(255,77,77,0.5);
+        }
+
+        /* TELA DE LOGIN */
         #tela-login { position: fixed; inset: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
         .logo-login { letter-spacing: 5px; color: #d4af37; font-size: 32px; font-weight: 900; margin-bottom: 30px; }
         
-        /* PIN SEGURO - SEM GITHUB NO ERRO */
-        .pin-input-limpo { 
+        /* INPUTS DE PIN SEGUROS */
+        .pin-field { 
             padding: 20px; width: 180px; border-radius: 20px; border: 2px solid #d4af37; 
             background: #111; color: #d4af37; font-size: 35px; text-align: center; 
-            outline: none; margin-bottom: 10px; letter-spacing: 12px; display: block;
+            outline: none; margin-bottom: 20px; letter-spacing: 12px; display: block;
             -webkit-text-security: disc;
         }
-        .pin-erro { border-color: #ff4d4d !important; animation: shake 0.3s; }
+        .shake { animation: shake 0.3s; border-color: #ff4d4d !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 
-        #aviso-erro {
-            display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #ff4d4d; color: #000; padding: 15px 30px; border-radius: 12px;
-            font-weight: 900; z-index: 11000; box-shadow: 0 10px 30px rgba(255,77,77,0.4);
-        }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-
+        /* DASHBOARD */
         .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; padding-bottom: 100px; }
         .card-total { background: linear-gradient(145deg, #151515, #050505); padding: 30px; border-radius: 25px; border: 1px solid #222; text-align: center; margin: 20px 0; border-bottom: 3px solid #d4af37; }
-        .input-cadastro { padding: 18px; width: 85%; border-radius: 12px; border: 2px solid #d4af37; background: #1a1a1a; color: #fff !important; font-size: 20px; text-align: center; outline: none; margin: 15px auto; display: block; }
+        
+        /* CLIENTES */
         .cliente-card { border-radius: 22px; margin-bottom: 15px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
         .card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
         .card-hoje { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
         .card-atraso { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-        .step { display: none; text-align: center; width: 100%; }
-        .step.active { display: block; }
-        .btn-prazo { background: transparent; border: 2px solid #333; color: #666; padding: 12px; width: 75px; border-radius: 12px; margin: 4px; font-weight: 700; cursor: pointer; }
-        .btn-prazo.selecionado { border-color: #d4af37; color: #d4af37; background: rgba(212,175,55,0.1); }
+        
         .acoes-btn { display: flex; flex-direction: column; gap: 6px; min-width: 90px; }
         .baixa-btn { background: #00ff00; color: #000; border: none; padding: 9px; border-radius: 10px; font-size: 11px; font-weight: 900; }
         .edit-btn { background: #fff; color: #000; border: none; padding: 9px; border-radius: 10px; font-size: 11px; font-weight: 900; }
         .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #333; padding: 9px; border-radius: 10px; font-size: 11px; font-weight: 900; }
-        
+
+        /* MODAIS */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        .input-cadastro { padding: 18px; width: 85%; border-radius: 12px; border: 2px solid #d4af37; background: #1a1a1a; color: #fff; font-size: 20px; text-align: center; outline: none; margin: 15px auto; display: block; }
+        .step { display: none; text-align: center; width: 100%; }
+        .step.active { display: block; }
+        .btn-prazo { background: transparent; border: 2px solid #333; color: #666; padding: 12px; width: 75px; border-radius: 12px; margin: 4px; font-weight: 700; }
+        .btn-prazo.selecionado { border-color: #d4af37; color: #d4af37; background: rgba(212,175,55,0.1); }
+
         /* CALCULADORA */
         #calc-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #222; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 8000; color: #fff; border: 1px solid #444; }
         #calc-container { display: none; position: fixed; bottom: 90px; right: 20px; width: 280px; background: #111; border: 1px solid #333; border-radius: 25px; padding: 15px; z-index: 8500; }
-        #calc-display { width: 100%; height: 60px; background: #000; color: #fff; font-size: 30px; text-align: right; padding: 10px; box-sizing: border-box; border-radius: 15px; margin-bottom: 12px; border: 1px solid #222; }
+        #calc-display { width: 100%; height: 60px; background: #000; color: #fff; font-size: 30px; text-align: right; padding: 10px; box-sizing: border-box; border-radius: 15px; margin-bottom: 12px; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .calc-btn { padding: 18px 0; border-radius: 12px; border: none; background: #1a1a1a; color: #fff; font-weight: 700; font-size: 18px; }
+        .calc-btn { padding: 18px 0; border-radius: 12px; border: none; background: #1a1a1a; color: #fff; font-weight: 700; }
         .calc-btn-op { background: #d4af37; color: #000; }
     </style>
 </head>
@@ -59,75 +67,75 @@
 
     <div id="tela-login">
         <div class="logo-login">VAN WALLET</div>
-        <input type="text" id="pin" class="pin-input-limpo" placeholder="••••" maxlength="4" inputmode="numeric" oninput="validarEntrada(this.value)">
-        <button class="btn-gold" onclick="tentarLoginDireto()">ACESSAR CONTA</button>
+        <input type="text" id="pin-main" class="pin-field" placeholder="••••" maxlength="4" inputmode="numeric" oninput="checarLogin(this.value)">
+        <button class="btn-gold" onclick="checarLogin(document.getElementById('pin-main').value)">ENTRAR</button>
     </div>
 
     <div id="conteudo-privado">
         <div class="card-total">
-            <small style="color: #666; font-weight: bold;">TOTAL A RECEBER</small>
+            <small style="color: #666; font-weight: bold; letter-spacing: 1px;">TOTAL NA RUA</small>
             <h1 id="total-rua" style="font-size: 45px; margin: 10px 0; color:#d4af37">R$ 0,00</h1>
         </div>
-        <button class="btn-gold" style="width: 100%; border-radius: 20px;" onclick="abrirCadastro()">+ NOVO EMPRÉSTIMO</button>
-        <div id="lista-clientes" style="margin-top: 35px;"></div>
+        <button class="btn-gold" style="width: 100%; border-radius: 20px;" onclick="abrirModal('modal-cadastro')">+ NOVO EMPRÉSTIMO</button>
+        <div id="lista-clientes" style="margin-top: 30px;"></div>
     </div>
 
     <div id="calc-fab" onclick="toggleCalc()">±</div>
     <div id="calc-container">
         <div id="calc-display">0</div>
         <div class="calc-grid">
-            <button class="calc-btn" style="grid-column: span 2; color:#ff4d4d;" onclick="calcClear()">C</button>
-            <button class="calc-btn calc-btn-op" onclick="calcOp('/')">÷</button>
-            <button class="calc-btn calc-btn-op" onclick="calcOp('*')">×</button>
-            <button class="calc-btn" onclick="calcNum('7')">7</button>
-            <button class="calc-btn" onclick="calcNum('8')">8</button>
-            <button class="calc-btn" onclick="calcNum('9')">9</button>
-            <button class="calc-btn calc-btn-op" onclick="calcOp('-')">-</button>
-            <button class="calc-btn" onclick="calcNum('4')">4</button>
-            <button class="calc-btn" onclick="calcNum('5')">5</button>
-            <button class="calc-btn" onclick="calcNum('6')">6</button>
-            <button class="calc-btn calc-btn-op" onclick="calcOp('+')">+</button>
-            <button class="calc-btn" onclick="calcNum('1')">1</button>
-            <button class="calc-btn" onclick="calcNum('2')">2</button>
-            <button class="calc-btn" onclick="calcNum('3')">3</button>
-            <button class="calc-btn calc-btn-op" onclick="calcEqual()">=</button>
-            <button class="calc-btn" style="grid-column: span 2;" onclick="calcNum('0')">0</button>
-            <button class="calc-btn" onclick="calcNum('.')">.</button>
+            <button class="calc-btn" style="grid-column: span 2; color:#ff4d4d;" onclick="cLimpar()">C</button>
+            <button class="calc-btn calc-btn-op" onclick="cOp('/')">÷</button>
+            <button class="calc-btn calc-btn-op" onclick="cOp('*')">×</button>
+            <button class="calc-btn" onclick="cNum('7')">7</button>
+            <button class="calc-btn" onclick="cNum('8')">8</button>
+            <button class="calc-btn" onclick="cNum('9')">9</button>
+            <button class="calc-btn calc-btn-op" onclick="cOp('-')">-</button>
+            <button class="calc-btn" onclick="cNum('4')">4</button>
+            <button class="calc-btn" onclick="cNum('5')">5</button>
+            <button class="calc-btn" onclick="cNum('6')">6</button>
+            <button class="calc-btn calc-btn-op" onclick="cOp('+')">+</button>
+            <button class="calc-btn" onclick="cNum('1')">1</button>
+            <button class="calc-btn" onclick="cNum('2')">2</button>
+            <button class="calc-btn" onclick="cNum('3')">3</button>
+            <button class="calc-btn calc-btn-op" onclick="cIgual()">=</button>
+            <button class="calc-btn" style="grid-column: span 2;" onclick="cNum('0')">0</button>
+            <button class="calc-btn" onclick="cNum('.')">.</button>
             <button class="calc-btn" onclick="toggleCalc()" style="background: #222;">✕</button>
         </div>
     </div>
 
-    <div id="modal-wizard" class="modal-overlay">
-        <div id="step-1" class="step active">
+    <div id="modal-cadastro" class="modal-overlay">
+        <div id="step1" class="step active">
             <h2 style="color:#d4af37">Nome do Cliente</h2>
-            <input type="text" id="w-nome" class="input-cadastro" placeholder="Nome...">
-            <button class="btn-gold" onclick="nextStep(2)">PRÓXIMO</button>
-            <p onclick="fecharCadastro()" style="color:#666; margin-top:30px; cursor:pointer;">CANCELAR</p>
+            <input type="text" id="cad-nome" class="input-cadastro" placeholder="Ex: João">
+            <button class="btn-gold" onclick="mudarStep(2)">PRÓXIMO</button>
+            <p onclick="fecharModal('modal-cadastro')" style="color:#666; margin-top:20px;">CANCELAR</p>
         </div>
-        <div id="step-2" class="step">
-            <h2 style="color:#d4af37">Valor</h2>
-            <input type="number" id="w-valor" class="input-cadastro" placeholder="0.00">
-            <button class="btn-gold" onclick="nextStep(3)">PRÓXIMO</button>
+        <div id="step2" class="step">
+            <h2 style="color:#d4af37">Valor Emprestado</h2>
+            <input type="number" id="cad-valor" class="input-cadastro" placeholder="0.00" inputmode="decimal">
+            <button class="btn-gold" onclick="mudarStep(3)">PRÓXIMO</button>
         </div>
-        <div id="step-3" class="step">
-            <h2 id="nome-final" style="color:#d4af37;"></h2>
-            <input type="date" id="w-data-manual" class="input-cadastro">
-            <div style="margin-bottom: 25px;">
-                <button id="p7" class="btn-prazo" onclick="selecionarPrazo(7)">7 D</button>
-                <button id="p15" class="btn-prazo" onclick="selecionarPrazo(15)">15 D</button>
-                <button id="p30" class="btn-prazo" onclick="selecionarPrazo(30)">30 D</button>
+        <div id="step3" class="step">
+            <h2 style="color:#d4af37">Data e Prazo</h2>
+            <input type="date" id="cad-data" class="input-cadastro">
+            <div style="margin-bottom: 20px;">
+                <button id="p7" class="btn-prazo selecionado" onclick="setPrazo(7)">7 D</button>
+                <button id="p15" class="btn-prazo" onclick="setPrazo(15)">15 D</button>
+                <button id="p30" class="btn-prazo" onclick="setPrazo(30)">30 D</button>
             </div>
-            <button class="btn-gold" style="background: #00ff00;" onclick="finalizarCadastro()">SALVAR</button>
+            <button class="btn-gold" style="background: #00ff00;" onclick="salvarNovo()">SALVAR</button>
         </div>
     </div>
 
     <div id="modal-editar" class="modal-overlay">
         <div class="card-total" style="width: 85%; max-width: 380px; border-color: #fff;">
-            <h2 style="color:#fff; margin-top:0;">Editar</h2>
+            <h2 style="color:#fff;">Editar Cliente</h2>
             <input type="text" id="edit-nome" class="input-cadastro">
-            <input type="number" id="edit-valor-total" class="input-cadastro" style="color:#00ff00 !important;">
-            <p style="color:#d4af37; font-size:12px;">PIN PARA SALVAR:</p>
-            <input type="text" id="pin-editar" class="pin-input-limpo" style="width: 100px; padding: 10px; font-size: 20px; margin: 0 auto 15px auto;" maxlength="4" inputmode="numeric">
+            <input type="number" id="edit-valor" class="input-cadastro" style="color:#00ff00 !important;">
+            <p style="color:#d4af37; font-size: 12px;">PIN PARA SALVAR:</p>
+            <input type="text" id="pin-edit" class="pin-field" style="width: 100px; font-size: 20px; margin: 0 auto 15px auto;" maxlength="4" inputmode="numeric">
             <div style="display: flex; gap: 10px;">
                 <button class="btn-prazo" style="width: 50%;" onclick="fecharModal('modal-editar')">VOLTAR</button>
                 <button class="btn-gold" id="btn-salvar-edit" style="width: 50%; background:#fff;">SALVAR</button>
@@ -137,79 +145,109 @@
 
     <div id="modal-info" class="modal-overlay">
         <div class="card-total" style="width: 85%; max-width: 380px; text-align: left; border-color: #d4af37;">
-            <h2 id="info-nome" style="color:#d4af37; margin: 0;">--</h2>
-            <small id="info-dia-semana" style="color: #d4af37; font-weight: 800; text-transform: uppercase;"></small>
+            <h2 id="info-nome" style="color:#d4af37; margin:0;">--</h2>
+            <small id="info-dia" style="color: #d4af37; font-weight: 800; text-transform: uppercase;"></small>
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin: 15px 0; border: 1px solid #222;">
                 <p style="color:#888; font-size: 11px;">VALOR ORIGINAL:</p>
-                <strong id="info-valor-limpo" style="color:#00ff00; font-size: 20px;">R$ 0,00</strong>
+                <strong id="info-val-orig" style="color:#00ff00; font-size: 20px;">R$ 0,00</strong>
                 <hr style="border:0; border-top:1px solid #222; margin: 10px 0;">
-                <p style="color:#888; font-size: 11px;">CADASTRADO EM:</p>
-                <strong id="info-data-hora" style="color:#fff; font-size: 14px;">--</strong>
+                <p style="color:#888; font-size: 11px;">DATA DE CADASTRO:</p>
+                <strong id="info-data-criado" style="color:#fff; font-size: 14px;">--</strong>
             </div>
-            <p style="color:#ccc; font-size: 13px;">Vencimento: <strong id="info-venc" style="color:#fff;">--</strong></p>
-            <p id="info-multa-box" style="color:#ff4d4d; font-weight: bold;"></p>
-            <button class="btn-gold" style="width: 100%; margin-top: 20px;" onclick="fecharModal('modal-info')">VOLTAR</button>
+            <p style="color:#ccc;">Vencimento: <strong id="info-venc" style="color:#fff;">--</strong></p>
+            <p id="info-multa" style="color:#ff4d4d; font-weight: bold;"></p>
+            <button class="btn-gold" style="width: 100%; margin-top: 15px;" onclick="fecharModal('modal-info')">FECHAR</button>
         </div>
     </div>
 
-    <div id="modal-confirma" class="modal-overlay">
+    <div id="modal-baixa" class="modal-overlay">
         <div class="card-total" style="width: 85%; max-width: 380px; border-color: #00ff00;">
-            <h2 style="color:#00ff00; margin-top:0;">Finalizar</h2>
-            <p style="color:#888;">PIN 9656:</p>
-            <input type="text" id="pin-baixa" class="pin-input-limpo" style="width: 120px;" maxlength="4" inputmode="numeric">
+            <h2 style="color:#00ff00;">Dar Baixa</h2>
+            <p style="color:#888;">Digite o PIN:</p>
+            <input type="text" id="pin-baixa" class="pin-field" style="width: 120px;" maxlength="4" inputmode="numeric">
             <div style="display: flex; gap: 10px;">
-                <button class="btn-prazo" style="width: 50%;" onclick="fecharModal('modal-confirma')">VOLTAR</button>
-                <button class="btn-gold" id="confirmar-baixa-btn" style="width: 50%; background:#00ff00;">BAIXAR</button>
+                <button class="btn-prazo" style="width: 50%;" onclick="fecharModal('modal-baixa')">VOLTAR</button>
+                <button class="btn-gold" id="btn-confirma-baixa" style="width: 50%; background:#00ff00;">BAIXAR</button>
             </div>
         </div>
     </div>
 
     <script>
-        const PIN_SISTEMA = "9656";
-        let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
-        let prazoSelecionado = 7;
+        const PIN = "9656";
+        let db = JSON.parse(localStorage.getItem('van_v2')) || [];
+        let prazoAtivo = 7;
 
-        function mostrarErro() {
+        function dispararErro() {
             const aviso = document.getElementById('aviso-erro');
             aviso.style.display = 'block';
-            setTimeout(() => { aviso.style.display = 'none'; }, 2000);
-            ['pin', 'pin-editar', 'pin-baixa'].forEach(id => {
+            setTimeout(() => aviso.style.display = 'none', 2000);
+            ['pin-main', 'pin-edit', 'pin-baixa'].forEach(id => {
                 const el = document.getElementById(id);
-                if(el) { el.classList.add('pin-erro'); el.value = ""; setTimeout(() => el.classList.remove('pin-erro'), 500); }
+                if(el) { el.classList.add('shake'); el.value = ""; setTimeout(() => el.classList.remove('shake'), 400); }
             });
         }
 
-        function validarEntrada(v) { if(v.length === 4) { if(v === PIN_SISTEMA) executarLogin(); else mostrarErro(); } }
-        function tentarLoginDireto() { if(document.getElementById('pin').value === PIN_SISTEMA) executarLogin(); else mostrarErro(); }
-        function executarLogin() { document.getElementById('tela-login').style.display = 'none'; document.getElementById('conteudo-privado').style.display = 'block'; render(); }
+        function checarLogin(v) { if(v === PIN) { document.getElementById('tela-login').style.display = 'none'; document.getElementById('conteudo-privado').style.display = 'block'; render(); } else if(v.length === 4) dispararErro(); }
 
-        let calcExp = "";
+        let cExp = "";
         function toggleCalc() { const c = document.getElementById('calc-container'); c.style.display = (c.style.display === 'block') ? 'none' : 'block'; }
-        function calcNum(n) { calcExp += n; document.getElementById('calc-display').innerText = calcExp; }
-        function calcOp(op) { calcExp += op; document.getElementById('calc-display').innerText = calcExp; }
-        function calcClear() { calcExp = ""; document.getElementById('calc-display').innerText = "0"; }
-        function calcEqual() { try { calcExp = eval(calcExp).toString(); document.getElementById('calc-display').innerText = calcExp; } catch(e) { calcClear(); } }
+        function cNum(n) { cExp += n; document.getElementById('calc-display').innerText = cExp; }
+        function cOp(op) { cExp += op; document.getElementById('calc-display').innerText = cExp; }
+        function cLimpar() { cExp = ""; document.getElementById('calc-display').innerText = "0"; }
+        function cIgual() { try { cExp = eval(cExp).toString(); document.getElementById('calc-display').innerText = cExp; } catch { cLimpar(); } }
 
-        function abrirCadastro() { document.getElementById('modal-wizard').style.display = 'flex'; resetSteps(); document.getElementById('w-data-manual').value = new Date().toISOString().split('T')[0]; }
-        function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
+        function abrirModal(id) { document.getElementById(id).style.display = 'flex'; if(id === 'modal-cadastro') { mudarStep(1); document.getElementById('cad-data').value = new Date().toISOString().split('T')[0]; } }
         function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
-        function nextStep(n) {
-            if(n === 2 && !document.getElementById('w-nome').value) return;
-            if(n === 3 && !document.getElementById('w-valor').value) return;
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('step-' + n).classList.add('active');
-            if(n === 3) document.getElementById('nome-final').innerText = document.getElementById('w-nome').value;
-        }
-        function resetSteps() { document.querySelectorAll('.step').forEach(s => s.classList.remove('active')); document.getElementById('step-1').classList.add('active'); }
-        function selecionarPrazo(d) { prazoSelecionado = d; document.querySelectorAll('.btn-prazo').forEach(b => b.classList.remove('selecionado')); document.getElementById('p' + d).classList.add('selecionado'); }
+        function mudarStep(s) { document.querySelectorAll('.step').forEach(x => x.classList.remove('active')); document.getElementById('step'+s).classList.add('active'); }
+        function setPrazo(d) { prazoAtivo = d; document.querySelectorAll('.btn-prazo').forEach(b => b.classList.remove('selecionado')); document.getElementById('p'+d).classList.add('selecionado'); }
 
-        function finalizarCadastro() {
-            const n = document.getElementById('w-nome').value, v = parseFloat(document.getElementById('w-valor').value), d = document.getElementById('w-data-manual').value;
-            if(n && v && d) {
-                const ag = new Date(), p = d.split('-'), dI = new Date(p[0], p[1]-1, p[2]), dV = new Date(dI); dV.setDate(dI.getDate() + prazoSelecionado);
-                db.push({ id: Date.now(), nome: n, valorOriginal: v, baseCobrar: v * 1.4, venci: dV.getTime(), venciFormat: dV.toLocaleDateString('pt-BR'), criadoEm: dI.toLocaleDateString('pt-BR') + " às " + ag.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}), diaSemana: dI.toLocaleDateString('pt-BR', {weekday: 'long'}) });
-                localStorage.setItem('van_vFinal', JSON.stringify(db)); fecharCadastro(); render();
-            }
+        function salvarNovo() {
+            const n = document.getElementById('cad-nome').value, v = parseFloat(document.getElementById('cad-valor').value), d = document.getElementById('cad-data').value;
+            if(!n || !v || !d) return;
+            const ag = new Date(), p = d.split('-'), dI = new Date(p[0], p[1]-1, p[2]), dV = new Date(dI); dV.setDate(dI.getDate() + prazoAtivo);
+            db.push({ id: Date.now(), nome: n, valO: v, valT: v * 1.4, venci: dV.getTime(), vStr: dV.toLocaleDateString('pt-BR'), criado: dI.toLocaleDateString('pt-BR') + " às " + ag.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}), dia: dI.toLocaleDateString('pt-BR', {weekday: 'long'}) });
+            localStorage.setItem('van_v2', JSON.stringify(db)); fecharModal('modal-cadastro'); render();
         }
 
-        function abrir
+        function abrirEditar(id) {
+            const i = db.find(x => x.id === id);
+            document.getElementById('edit-nome').value = i.nome; document.getElementById('edit-valor').value = i.valT; document.getElementById('pin-edit').value = "";
+            abrirModal('modal-editar');
+            document.getElementById('btn-salvar-edit').onclick = () => {
+                if(document.getElementById('pin-edit').value === PIN) { i.nome = document.getElementById('edit-nome').value; i.valT = parseFloat(document.getElementById('edit-valor').value); localStorage.setItem('van_v2', JSON.stringify(db)); fecharModal('modal-editar'); render(); }
+                else dispararErro();
+            };
+        }
+
+        function verInfo(id) {
+            const i = db.find(x => x.id === id); const hoje = new Date().setHours(0,0,0,0);
+            const diff = Math.ceil((i.venci - hoje) / 86400000); let m = diff < 0 ? Math.abs(diff) * 40 : 0;
+            document.getElementById('info-nome').innerText = i.nome; document.getElementById('info-dia').innerText = i.dia;
+            document.getElementById('info-val-orig').innerText = "R$ " + i.valO.toFixed(2); document.getElementById('info-data-criado').innerText = i.criado;
+            document.getElementById('info-venc').innerText = i.vStr; document.getElementById('info-multa').innerText = m > 0 ? "Multa Atraso: R$ " + m.toFixed(2) : "";
+            abrirModal('modal-info');
+        }
+
+        function abrirBaixa(id) {
+            document.getElementById('pin-baixa').value = ""; abrirModal('modal-baixa');
+            document.getElementById('btn-confirma-baixa').onclick = () => {
+                if(document.getElementById('pin-baixa').value === PIN) { db = db.filter(x => x.id !== id); localStorage.setItem('van_v2', JSON.stringify(db)); fecharModal('modal-baixa'); render(); }
+                else dispararErro();
+            };
+        }
+
+        function render() {
+            const lista = document.getElementById('lista-clientes'); lista.innerHTML = "";
+            let t = 0; const hoje = new Date().setHours(0,0,0,0);
+            db.sort((a,b) => a.venci - b.venci).forEach(i => {
+                const diff = Math.ceil((i.venci - hoje) / 86400000);
+                let totalC = i.valT + (diff < 0 ? Math.abs(diff)*40 : 0);
+                let cl = diff < 0 ? "card-atraso" : (diff === 0 ? "card-hoje" : "card-ok");
+                t += totalC;
+                lista.innerHTML += `<div class="cliente-card ${cl}"><div><span style="font-weight:600;">${i.nome}</span><br><span style="font-size:24px; font-weight:900;">R$ ${totalC.toFixed(2)}</span><br><small>${diff < 0 ? 'ATRASADO' : (diff === 0 ? 'HOJE' : 'VENCERÁ')}</small></div><div class="acoes-btn"><button class="baixa-btn" onclick="abrirBaixa(${i.id})">BAIXAR</button><button class="edit-btn" onclick="abrirEditar(${i.id})">EDITAR</button><button class="info-btn" onclick="verInfo(${i.id})">INFO</button></div></div>`;
+            });
+            document.getElementById('total-rua').innerText = "R$ " + t.toLocaleString('pt-BR', {minimumFractionDigits:2});
+        }
+    </script>
+</body>
+</html>
