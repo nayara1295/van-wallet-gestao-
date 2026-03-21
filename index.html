@@ -6,18 +6,30 @@
     <title>VAN WALLET</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
+        
+        /* TELA DE LOGIN - MELHORADA */
         #tela-login { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-        input#pin { padding: 20px; width: 260px; border-radius: 15px; border: 2px solid #333; background: #111; color: #d4af37; font-size: 24px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 10px; }
-        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        input#pin { padding: 20px; width: 260px; border-radius: 15px; border: 2px solid #333; background: #111; color: #d4af37; font-size: 24px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 10px; -webkit-appearance: none; }
+        .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: transform 0.1s; }
+        .btn-gold:active { transform: scale(0.95); }
+        
+        /* DASHBOARD */
         #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; }
         .card-total { background: linear-gradient(145deg, #151515, #050505); padding: 30px; border-radius: 25px; border: 1px solid #222; text-align: center; margin: 20px 0; }
+        
+        /* INPUTS DO CADASTRO */
         .input-cadastro { padding: 18px; width: 85%; border-radius: 12px; border: 2px solid #d4af37; background: #1a1a1a; color: #fff !important; font-size: 20px; text-align: center; outline: none; margin: 15px auto; display: block; }
+        
+        /* CARDS DOS CLIENTES */
         .cliente-card { border-radius: 22px; margin-bottom: 15px; padding: 22px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; position: relative; }
         .card-ok { background: linear-gradient(145deg, #0a180a, #040804); border-color: #1e3a1e; }
         .card-hoje { background: linear-gradient(145deg, #2a2006, #110d02); border-color: #d4af37; }
         .card-atraso { background: linear-gradient(145deg, #2a0a0a, #110404); border-color: #ff4d4d; }
+
         .valor-receber { font-size: 26px; font-weight: 900; color: #fff; display: block; margin: 5px 0; }
         .multa-alerta { font-size: 10px; background: #ff4d4d; color: #fff; padding: 4px 10px; border-radius: 20px; font-weight: bold; position: absolute; top: 15px; right: 15px; }
+        
+        /* MODAL UNIFICADO */
         #modal-wizard { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; flex-direction: column; align-items: center; justify-content: center; }
         .step { display: none; text-align: center; width: 100%; }
         .step.active { display: block; }
@@ -31,8 +43,9 @@
 
     <div id="tela-login">
         <h1 style="letter-spacing: 5px; color:#fff;">VAN WALLET</h1>
-        <input type="password" id="pin" placeholder="PIN" maxlength="6">
-        <button class="btn-gold" onclick="login()">ACESSAR</button>
+        <input type="tel" id="pin" placeholder="PIN" maxlength="6" autocomplete="off">
+        <button class="btn-gold" id="btn-entrar" onclick="login()">ACESSAR</button>
+        <p id="msg-erro" style="color: #ff4d4d; font-size: 12px; margin-top: 15px; display: none;">PIN INCORRETO</p>
     </div>
 
     <div id="conteudo-privado">
@@ -66,11 +79,9 @@
                 <button class="btn-prazo" onclick="finalizar(15)">15 D</button>
                 <button class="btn-prazo" onclick="finalizar(30)">30 D</button>
             </div>
-            
             <hr style="border: 0; border-top: 1px solid #222; width: 80%; margin: 20px auto;">
-            
             <p style="color:#666; font-size: 14px;">Data Manual (Se for antigo):</p>
-            <input type="date" id="w-data-manual" class="input-cadastro" style="font-size: 16px; padding: 12px; border-color: #444;">
+            <input type="date" id="w-data-manual" class="input-cadastro" style="font-size: 16px; padding: 12px;">
         </div>
     </div>
 
@@ -78,18 +89,35 @@
         const PIN_CORRETO = "102030";
         let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
 
+        // Força a limpeza de qualquer tentativa anterior travada
+        window.onload = function() {
+            document.getElementById('pin').value = "";
+            console.log("Sistema pronto.");
+        };
+
         function login() {
-            if(document.getElementById('pin').value === PIN_CORRETO) {
+            const inputPin = document.getElementById('pin').value;
+            const msgErro = document.getElementById('msg-erro');
+            
+            if(inputPin === PIN_CORRETO) {
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('conteudo-privado').style.display = 'block';
                 render();
-            } else { alert("PIN INVÁLIDO"); }
+            } else {
+                msgErro.style.display = 'block';
+                setTimeout(() => { msgErro.style.display = 'none'; }, 2000);
+                document.getElementById('pin').value = "";
+            }
         }
+
+        // Permitir dar "Enter" no teclado para logar
+        document.getElementById('pin').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') login();
+        });
 
         function abrirCadastro() { 
             document.getElementById('modal-wizard').style.display = 'flex'; 
             resetSteps();
-            // Define hoje como padrão no calendário
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('w-data-manual').value = hoje;
         }
@@ -130,4 +158,50 @@
                     dataCriacao: dataInicio.toLocaleDateString('pt-BR'),
                     capital: valor,
                     baseCobrar: valor * 1.40,
-                    venci: dataVenc.getTime
+                    venci: dataVenc.getTime(),
+                    venciFormat: dataVenc.toLocaleDateString('pt-BR')
+                });
+                localStorage.setItem('van_vFinal', JSON.stringify(db));
+                fecharCadastro(); render();
+            }
+        }
+
+        function verInfo(id) {
+            const i = db.find(item => item.id === id);
+            const hojeTs = new Date().setHours(0,0,0,0);
+            const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
+            let multa = diff < 0 ? Math.abs(diff) * 30 : 0;
+
+            alert(`DETALHES:\n\n👤 Cliente: ${i.nome}\n📅 Início: ${i.dataCriacao}\n🏁 Vencimento: ${i.venciFormat}\n💰 Base + Lucro: R$ ${i.baseCobrar.toFixed(2)}\n🚨 Multa: R$ ${multa.toFixed(2)}\n\nTOTAL: R$ ${(i.baseCobrar + multa).toFixed(2)}`);
+        }
+
+        function render() {
+            const lista = document.getElementById('lista-clientes');
+            lista.innerHTML = "";
+            let somaTotal = 0;
+            const hojeTs = new Date().setHours(0,0,0,0);
+            db.sort((a, b) => a.venci - b.venci);
+
+            db.forEach(i => {
+                const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
+                let valorFinal = i.baseCobrar;
+                let multa = 0;
+                let classe = "card-ok", corTxt = "#00ff00", statusTxt = `Faltam ${diff} dias`;
+
+                if(diff === 0) { 
+                    classe = "card-hoje"; corTxt = "#fff"; statusTxt = "VENCE HOJE"; 
+                } else if(diff < 0) {
+                    multa = Math.abs(diff) * 30;
+                    valorFinal = i.baseCobrar + multa;
+                    classe = "card-atraso"; corTxt = "#fff"; statusTxt = `ATRASADO ${Math.abs(diff)} DIAS`;
+                }
+
+                somaTotal += valorFinal;
+                lista.innerHTML += `<div class="cliente-card ${classe}">${multa > 0 ? `<div class="multa-alerta">+ R$ ${multa}</div>` : ''}<div><span style="font-weight: 600;">${i.nome}</span><br><span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span><span style="color: ${corTxt}; font-size:12px; font-weight:800;">${statusTxt}</span></div><div class="acoes-btn"><button class="baixa-btn" onclick="remover(${i.id})">BAIXA</button><button class="info-btn" onclick="verInfo(${i.id})">INFO</button></div></div>`;
+            });
+            document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        }
+        function remover(id) { if(confirm("Confirmar recebimento?")) { db = db.filter(c => c.id !== id); localStorage.setItem('van_vFinal', JSON.stringify(db)); render(); } }
+    </script>
+</body>
+</html>
