@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VAN WALLET - V2</title>
+    <title>VAN WALLET - SEGURA</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background-color: #000; font-family: 'Inter', sans-serif; color: #fff; }
         #tela-login { position: fixed; inset: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
         .logo-login { letter-spacing: 5px; color: #d4af37; font-size: 32px; font-weight: 900; margin-bottom: 30px; }
-        input#pin { padding: 20px; width: 240px; border-radius: 15px; border: 2px solid #d4af37; background: #111; color: #d4af37; font-size: 28px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 8px; display: block; -webkit-text-security: disc; }
+        input#pin { padding: 20px; width: 200px; border-radius: 15px; border: 2px solid #d4af37; background: #111; color: #d4af37; font-size: 32px; text-align: center; outline: none; margin-bottom: 20px; letter-spacing: 10px; display: block; -webkit-text-security: disc; }
         .btn-gold { padding: 18px; width: 280px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         #conteudo-privado { display: none; padding: 20px; max-width: 450px; margin: 0 auto; padding-bottom: 80px; }
         .card-total { background: linear-gradient(145deg, #151515, #050505); padding: 30px; border-radius: 25px; border: 1px solid #222; text-align: center; margin: 20px 0; }
@@ -24,24 +24,23 @@
         .btn-prazo.selecionado { border-color: #d4af37; color: #d4af37; background: rgba(212,175,55,0.1); }
         .acoes-btn { display: flex; flex-direction: column; gap: 5px; min-width: 85px; }
         .baixa-btn { background: #00ff00; color: #000; border: none; padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
-        .edit-btn { background: #fff; color: #000; border: none; padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
         .info-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
         .valor-receber { font-size: 24px; font-weight: 900; color: #fff; display: block; margin: 2px 0; }
         .txt-multa { color: #ff4d4d; font-size: 11px; font-weight: 900; display: block; margin-top: 2px; }
-        #calc-fab { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: #222; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 6000; cursor: pointer; color: #fff; font-weight: bold; border: 1px solid #333; }
-        #calc-container { display: none; position: fixed; bottom: 85px; right: 20px; width: 260px; background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; z-index: 6000; box-shadow: 0 10px 40px rgba(0,0,0,0.9); }
-        #calc-display { width: 100%; height: 55px; background: #000; border: 1px solid #222; color: #fff; font-family: 'Inter', sans-serif; font-size: 28px; text-align: right; padding: 10px; box-sizing: border-box; border-radius: 12px; margin-bottom: 12px; font-weight: 700; }
+        
+        #calc-fab { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: #222; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 22px; z-index: 6000; color: #fff; font-weight: bold; border: 1px solid #333; }
+        #calc-container { display: none; position: fixed; bottom: 85px; right: 20px; width: 260px; background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; z-index: 6000; }
+        #calc-display { width: 100%; height: 55px; background: #000; color: #fff; font-size: 28px; text-align: right; padding: 10px; box-sizing: border-box; border-radius: 12px; margin-bottom: 12px; border: 1px solid #222; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .calc-btn { padding: 15px 0; border-radius: 12px; border: none; background: #1a1a1a; color: #fff; font-weight: 700; cursor: pointer; font-size: 18px; }
+        .calc-btn { padding: 15px 0; border-radius: 12px; border: none; background: #1a1a1a; color: #fff; font-weight: 700; font-size: 18px; }
         .calc-btn-op { background: #d4af37; color: #000; }
-        .calc-btn-clear { background: #333; color: #ff4d4d; grid-column: span 2; }
     </style>
 </head>
 <body>
 
     <div id="tela-login">
         <div class="logo-login">VAN WALLET</div>
-        <input type="tel" id="pin" placeholder="••••••" maxlength="6" oninput="checarPin(this.value)">
+        <input type="tel" id="pin" placeholder="••••" maxlength="4" oninput="checarPin(this.value)">
         <button class="btn-gold" onclick="login()">ACESSAR CONTA</button>
     </div>
 
@@ -58,7 +57,7 @@
     <div id="calc-container">
         <div id="calc-display">0</div>
         <div class="calc-grid">
-            <button class="calc-btn calc-btn-clear" onclick="calcClear()">C</button>
+            <button class="calc-btn" style="grid-column: span 2; color:red;" onclick="calcClear()">C</button>
             <button class="calc-btn calc-btn-op" onclick="calcOp('/')">÷</button>
             <button class="calc-btn calc-btn-op" onclick="calcOp('*')">×</button>
             <button class="calc-btn" onclick="calcNum('7')">7</button>
@@ -105,25 +104,20 @@
         </div>
     </div>
 
-    <div id="modal-editar" class="modal-overlay">
-        <div class="card-total" style="width: 85%; max-width: 380px; border-color: #fff;">
-            <h2 style="color:#fff;">Abater / Editar</h2>
-            <input type="text" id="edit-nome" class="input-cadastro" style="font-size: 16px;">
-            <input type="number" id="edit-valor-total" class="input-cadastro" style="font-size: 24px; color:#00ff00 !important;" placeholder="R$ 0,00">
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-prazo" style="width: 50%; margin:0;" onclick="fecharModal('modal-editar')">CANCELAR</button>
-                <button class="btn-gold" id="btn-salvar-edit" style="width: 50%; background:#00ff00; color:#000; margin:0;">SALVAR</button>
-            </div>
-        </div>
-    </div>
-
     <div id="modal-info" class="modal-overlay">
         <div class="card-total" style="width: 85%; max-width: 380px; text-align: left; border-color: #d4af37;">
             <h2 id="info-nome" style="color:#d4af37; margin-top: 0;">--</h2>
-            <p style="color:#ccc;">Vencimento: <strong id="info-venc" style="color:#fff;">--</strong></p>
-            <p style="color:#ff4d4d; font-weight: bold;">Multa (R$ 40/dia): R$ <span id="info-multa">0,00</span></p>
+            <small id="info-dia-semana" style="color: #d4af37; font-weight: 800; text-transform: uppercase;"></small>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin: 15px 0;">
+                <p style="margin: 5px 0; color:#ccc; font-size: 13px;">Feito em:</p>
+                <strong id="info-data-hora" style="color:#fff;">--</strong>
+                <p style="margin: 15px 0 5px 0; color:#ccc; font-size: 13px;">Valor Original (Sem Juros):</p>
+                <strong id="info-valor-limpo" style="color:#fff; font-size: 20px;">R$ 0,00</strong>
+            </div>
+            <p style="color:#ccc; font-size: 13px;">Vencimento: <strong id="info-venc" style="color:#fff;">--</strong></p>
+            <p style="color:#ff4d4d; font-weight: bold;">Multa: R$ <span id="info-multa">0,00</span></p>
             <hr style="border: 0; border-top: 1px solid #222;">
-            <p style="font-size: 18px;">TOTAL ATUALIZADO:<br><span style="color: #00ff00; font-size: 32px; font-weight: 900;">R$ <span id="info-total">0,00</span></span></p>
+            <p style="font-size: 18px; color: #00ff00; font-weight: 900;">TOTAL ATUALIZADO: R$ <span id="info-total">0,00</span></p>
             <button class="btn-gold" style="width: 100%; margin-top: 15px;" onclick="fecharModal('modal-info')">VOLTAR</button>
         </div>
     </div>
@@ -131,37 +125,33 @@
     <div id="modal-confirma" class="modal-overlay">
         <div class="card-total" style="width: 85%; max-width: 380px; border-color: #00ff00;">
             <h2 style="color:#00ff00;">Baixar Parcela?</h2>
-            <p>Confirmar pagamento de:<br><strong id="confirma-nome" style="font-size: 20px; color:#fff;">--</strong></p>
-            <div style="display: flex; gap: 10px; margin-top: 25px;">
-                <button class="btn-prazo" style="width: 50%; margin:0;" onclick="fecharModal('modal-confirma')">NÃO</button>
-                <button class="btn-gold" id="confirmar-baixa-btn" style="width: 50%; background:#00ff00; margin:0;">SIM</button>
+            <p>Confirme o PIN de segurança para pagar:</p>
+            <input type="tel" id="pin-baixa" placeholder="PIN" maxlength="4" style="padding: 15px; width: 120px; border-radius: 10px; border: 2px solid #00ff00; background: #000; color: #00ff00; font-size: 24px; text-align: center; margin-bottom: 20px; -webkit-text-security: disc;">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-prazo" style="width: 50%; margin:0;" onclick="fecharModal('modal-confirma')">CANCELAR</button>
+                <button class="btn-gold" id="confirmar-baixa-btn" style="width: 50%; background:#00ff00; margin:0;">CONFIRMAR</button>
             </div>
         </div>
     </div>
 
     <script>
-        const PIN_CORRETO = "102030";
+        const PIN_CORRETO = "9656";
         let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
         let prazoSelecionado = 7;
 
         function checarPin(valor) {
-            if(valor.length === 6) {
-                if(valor === PIN_CORRETO) { login(); }
-            }
+            if(valor.length === 4 && valor === PIN_CORRETO) login();
         }
 
-        function login() { 
-            const pinDigitado = document.getElementById('pin').value.trim();
-            if(pinDigitado === PIN_CORRETO) { 
-                document.getElementById('tela-login').style.display = 'none'; 
-                document.getElementById('conteudo-privado').style.display = 'block'; 
-                render(); 
-            } else {
-                alert("PIN INCORRETO!");
-                document.getElementById('pin').value = "";
-            }
+        function login() {
+            const pinVal = document.getElementById('pin').value;
+            if(pinVal === PIN_CORRETO) {
+                document.getElementById('tela-login').style.display = 'none';
+                document.getElementById('conteudo-privado').style.display = 'block';
+                render();
+            } else { alert("PIN INCORRETO!"); document.getElementById('pin').value = ""; }
         }
-        
+
         let calcExpressao = "";
         function toggleCalc() {
             const c = document.getElementById('calc-container');
@@ -171,79 +161,85 @@
         function calcOp(op) { calcExpressao += op; document.getElementById('calc-display').innerText = calcExpressao; }
         function calcClear() { calcExpressao = ""; document.getElementById('calc-display').innerText = "0"; }
         function calcEqual() {
-            try {
-                let res = eval(calcExpressao);
-                calcExpressao = Number.isInteger(res) ? res.toString() : res.toFixed(2);
-                document.getElementById('calc-display').innerText = calcExpressao;
-            } catch(e) { document.getElementById('calc-display').innerText = "Erro"; calcExpressao = ""; }
+            try { let res = eval(calcExpressao); calcExpressao = res.toString(); document.getElementById('calc-display').innerText = calcExpressao; }
+            catch(e) { document.getElementById('calc-display').innerText = "Erro"; calcExpressao = ""; }
         }
 
-        function abrirCadastro() { document.getElementById('modal-wizard').style.display = 'flex'; resetSteps(); document.getElementById('w-data-manual').value = new Date().toISOString().split('T')[0]; selecionarPrazo(7); }
+        function abrirCadastro() { document.getElementById('modal-wizard').style.display = 'flex'; resetSteps(); document.getElementById('w-data-manual').value = new Date().toISOString().split('T')[0]; }
         function fecharCadastro() { document.getElementById('modal-wizard').style.display = 'none'; }
         function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+
         function nextStep(n) {
-            if(n === 2 && document.getElementById('w-nome').value === "") return;
-            if(n === 3 && document.getElementById('w-valor').value === "") return;
+            if(n === 2 && !document.getElementById('w-nome').value) return;
+            if(n === 3 && !document.getElementById('w-valor').value) return;
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-' + n).classList.add('active');
             if(n === 3) document.getElementById('nome-final').innerText = document.getElementById('w-nome').value;
         }
+
         function resetSteps() {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-1').classList.add('active');
             document.getElementById('w-nome').value = ""; document.getElementById('w-valor').value = "";
         }
+
         function selecionarPrazo(d) {
             prazoSelecionado = d;
             document.querySelectorAll('.btn-prazo').forEach(b => b.classList.remove('selecionado'));
             document.getElementById('p' + d).classList.add('selecionado');
         }
+
         function finalizarCadastro() {
             const nome = document.getElementById('w-nome').value;
-            const valor = parseFloat(document.getElementById('w-valor').value);
+            const valorOrig = parseFloat(document.getElementById('w-valor').value);
             const dataStr = document.getElementById('w-data-manual').value;
-            if(nome && valor && dataStr) {
+            if(nome && valorOrig && dataStr) {
+                const agora = new Date();
                 const p = dataStr.split('-');
-                const dI = new Date(p[0], p[1]-1, p[2]); dI.setHours(0,0,0,0);
+                const dI = new Date(p[0], p[1]-1, p[2]);
                 const dV = new Date(dI); dV.setDate(dI.getDate() + prazoSelecionado);
-                db.push({ id: Date.now(), nome, baseCobrar: valor * 1.4, venci: dV.getTime(), venciFormat: dV.toLocaleDateString('pt-BR') });
+                db.push({
+                    id: Date.now(),
+                    nome,
+                    valorOriginal: valorOrig,
+                    baseCobrar: valorOrig * 1.4,
+                    venci: dV.getTime(),
+                    venciFormat: dV.toLocaleDateString('pt-BR'),
+                    criadoEm: dI.toLocaleDateString('pt-BR') + " às " + agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
+                    diaSemana: dI.toLocaleDateString('pt-BR', {weekday: 'long'})
+                });
                 localStorage.setItem('van_vFinal', JSON.stringify(db));
                 fecharCadastro(); render();
             }
         }
-        function abrirEditar(id) {
-            const i = db.find(item => item.id === id);
-            document.getElementById('edit-nome').value = i.nome;
-            document.getElementById('edit-valor-total').value = i.baseCobrar.toFixed(2);
-            document.getElementById('modal-editar').style.display = 'flex';
-            document.getElementById('btn-salvar-edit').onclick = function() {
-                i.nome = document.getElementById('edit-nome').value;
-                i.baseCobrar = parseFloat(document.getElementById('edit-valor-total').value);
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                fecharModal('modal-editar'); render();
-            };
-        }
+
         function verInfo(id) {
             const i = db.find(item => item.id === id);
             const hojeTs = new Date().setHours(0,0,0,0);
             const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
             let multa = diff < 0 ? Math.abs(diff) * 40 : 0;
             document.getElementById('info-nome').innerText = i.nome;
+            document.getElementById('info-dia-semana').innerText = i.diaSemana || "";
+            document.getElementById('info-data-hora').innerText = i.criadoEm || "";
+            document.getElementById('info-valor-limpo').innerText = "R$ " + i.valorOriginal.toFixed(2);
             document.getElementById('info-venc').innerText = i.venciFormat;
             document.getElementById('info-multa').innerText = multa.toFixed(2);
             document.getElementById('info-total').innerText = (i.baseCobrar + multa).toFixed(2);
             document.getElementById('modal-info').style.display = 'flex';
         }
+
         function abrirConfirmaBaixa(id) {
-            const i = db.find(item => item.id === id);
-            document.getElementById('confirma-nome').innerText = i.nome;
+            document.getElementById('pin-baixa').value = "";
             document.getElementById('modal-confirma').style.display = 'flex';
             document.getElementById('confirmar-baixa-btn').onclick = function() {
-                db = db.filter(c => c.id !== id);
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                fecharModal('modal-confirma'); render();
+                if(document.getElementById('pin-baixa').value === PIN_CORRETO) {
+                    db = db.filter(c => c.id !== id);
+                    localStorage.setItem('van_vFinal', JSON.stringify(db));
+                    fecharModal('modal-confirma'); render();
+                } else { alert("PIN DE BAIXA INCORRETO!"); }
             };
         }
+
         function render() {
             const lista = document.getElementById('lista-clientes'); lista.innerHTML = "";
             let somaTotal = 0; const hojeTs = new Date().setHours(0,0,0,0);
@@ -257,15 +253,11 @@
                 somaTotal += valorFinal;
                 lista.innerHTML += `
                     <div class="cliente-card ${classe}">
-                        <div>
-                            <span style="font-weight: 600;">${i.nome}</span><br>
-                            <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span>
-                            <span style="font-size:10px; font-weight:bold; opacity:0.8;">${st}</span>
-                            ${multa > 0 ? `<span class="txt-multa">+ R$ ${multa.toFixed(2)} Multa</span>` : ''}
-                        </div>
+                        <div><span style="font-weight:600;">${i.nome}</span><br>
+                        <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span><br>
+                        <small style="font-weight:bold; opacity:0.8;">${st}</small></div>
                         <div class="acoes-btn">
                             <button class="baixa-btn" onclick="abrirConfirmaBaixa(${i.id})">BAIXAR</button>
-                            <button class="edit-btn" onclick="abrirEditar(${i.id})">EDITAR</button>
                             <button class="info-btn" onclick="verInfo(${i.id})">INFO</button>
                         </div>
                     </div>`;
