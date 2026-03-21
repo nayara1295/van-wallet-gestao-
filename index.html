@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CARTEIRA VANUBIA - V2</title>
+    <title>CARTEIRA VANUBIA</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background-color: #000; font-family: 'Inter', sans-serif; color: #fff; }
         #tela-login { position: fixed; inset: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
@@ -140,7 +140,8 @@
     </div>
 
     <script>
-        const PIN_CORRETO = "102030";
+        // SENHA ATUALIZADA: 9656
+        const PIN_CORRETO = "9656";
         let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
         let prazoSelecionado = 7;
 
@@ -151,7 +152,7 @@
                 document.getElementById('conteudo-privado').style.display = 'block'; 
                 render(); 
             } else {
-                alert("PIN INCORRETO!");
+                alert("SENHA INCORRETA!");
             }
         }
         
@@ -210,10 +211,15 @@
             document.getElementById('edit-valor-total').value = i.baseCobrar.toFixed(2);
             document.getElementById('modal-editar').style.display = 'flex';
             document.getElementById('btn-salvar-edit').onclick = function() {
-                i.nome = document.getElementById('edit-nome').value;
-                i.baseCobrar = parseFloat(document.getElementById('edit-valor-total').value);
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                fecharModal('modal-editar'); render();
+                const conf = prompt("DIGITE A SENHA PARA SALVAR:");
+                if(conf === PIN_CORRETO) {
+                    i.nome = document.getElementById('edit-nome').value;
+                    i.baseCobrar = parseFloat(document.getElementById('edit-valor-total').value);
+                    localStorage.setItem('van_vFinal', JSON.stringify(db));
+                    fecharModal('modal-editar'); render();
+                } else {
+                    alert("SENHA INCORRETA!");
+                }
             };
         }
         function verInfo(id) {
@@ -232,9 +238,14 @@
             document.getElementById('confirma-nome').innerText = i.nome;
             document.getElementById('modal-confirma').style.display = 'flex';
             document.getElementById('confirmar-baixa-btn').onclick = function() {
-                db = db.filter(c => c.id !== id);
-                localStorage.setItem('van_vFinal', JSON.stringify(db));
-                fecharModal('modal-confirma'); render();
+                const conf = prompt("DIGITE A SENHA PARA BAIXAR:");
+                if(conf === PIN_CORRETO) {
+                    db = db.filter(c => c.id !== id);
+                    localStorage.setItem('van_vFinal', JSON.stringify(db));
+                    fecharModal('modal-confirma'); render();
+                } else {
+                    alert("SENHA INCORRETA!");
+                }
             };
         }
         function render() {
