@@ -57,29 +57,24 @@
     </div>
 
     <button id="calc-fab" onclick="toggleCalc()">±</button>
-    
     <div id="calc-container">
         <div id="calc-display">0</div>
         <div class="calc-grid">
             <button class="calc-btn calc-btn-clear" onclick="calcClear()">C</button>
             <button class="calc-btn calc-btn-op" onclick="calcOp('/')">÷</button>
             <button class="calc-btn calc-btn-op" onclick="calcOp('*')">×</button>
-            
             <button class="calc-btn" onclick="calcNum('7')">7</button>
             <button class="calc-btn" onclick="calcNum('8')">8</button>
             <button class="calc-btn" onclick="calcNum('9')">9</button>
             <button class="calc-btn calc-btn-op" onclick="calcOp('-')">-</button>
-            
             <button class="calc-btn" onclick="calcNum('4')">4</button>
             <button class="calc-btn" onclick="calcNum('5')">5</button>
             <button class="calc-btn" onclick="calcNum('6')">6</button>
             <button class="calc-btn calc-btn-op" onclick="calcOp('+')">+</button>
-            
             <button class="calc-btn" onclick="calcNum('1')">1</button>
             <button class="calc-btn" onclick="calcNum('2')">2</button>
             <button class="calc-btn" onclick="calcNum('3')">3</button>
             <button class="calc-btn calc-btn-op" onclick="calcEqual()">=</button>
-            
             <button class="calc-btn" style="grid-column: span 2;" onclick="calcNum('0')">0</button>
             <button class="calc-btn" onclick="calcNum('.')">.</button>
             <button class="calc-btn" onclick="toggleCalc()" style="background: #222;">✕</button>
@@ -151,7 +146,18 @@
         let db = JSON.parse(localStorage.getItem('van_vFinal')) || [];
         let prazoSelecionado = 7;
 
-        function login() { if(document.getElementById('pin').value === PIN_CORRETO) { document.getElementById('tela-login').style.display = 'none'; document.getElementById('conteudo-privado').style.display = 'block'; render(); } }
+        function login() { 
+            const campoPin = document.getElementById('pin');
+            const pinDigitado = campoPin.value.trim();
+            if(pinDigitado === PIN_CORRETO) { 
+                document.getElementById('tela-login').style.display = 'none'; 
+                document.getElementById('conteudo-privado').style.display = 'block'; 
+                render(); 
+            } else {
+                alert("PIN INCORRETO!");
+                campoPin.value = "";
+            }
+        }
         
         let calcExpressao = "";
         function toggleCalc() {
@@ -195,4 +201,74 @@
             const dataStr = document.getElementById('w-data-manual').value;
             if(nome && valor && dataStr) {
                 const p = dataStr.split('-');
-                const dI = new Date(p[0], p[1]-1, p[2]); dI.setHours(
+                const dI = new Date(p[0], p[1]-1, p[2]); dI.setHours(0,0,0,0);
+                const dV = new Date(dI); dV.setDate(dI.getDate() + prazoSelecionado);
+                db.push({ id: Date.now(), nome, baseCobrar: valor * 1.4, venci: dV.getTime(), venciFormat: dV.toLocaleDateString('pt-BR') });
+                localStorage.setItem('van_vFinal', JSON.stringify(db));
+                fecharCadastro(); render();
+            }
+        }
+        function abrirEditar(id) {
+            const i = db.find(item => item.id === id);
+            document.getElementById('edit-nome').value = i.nome;
+            document.getElementById('edit-valor-total').value = i.baseCobrar.toFixed(2);
+            document.getElementById('modal-editar').style.display = 'flex';
+            document.getElementById('btn-salvar-edit').onclick = function() {
+                i.nome = document.getElementById('edit-nome').value;
+                i.baseCobrar = parseFloat(document.getElementById('edit-valor-total').value);
+                localStorage.setItem('van_vFinal', JSON.stringify(db));
+                fecharModal('modal-editar'); render();
+            };
+        }
+        function verInfo(id) {
+            const i = db.find(item => item.id === id);
+            const hojeTs = new Date().setHours(0,0,0,0);
+            const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
+            let multa = diff < 0 ? Math.abs(diff) * 40 : 0;
+            document.getElementById('info-nome').innerText = i.nome;
+            document.getElementById('info-venc').innerText = i.venciFormat;
+            document.getElementById('info-multa').innerText = multa.toFixed(2);
+            document.getElementById('info-total').innerText = (i.baseCobrar + multa).toFixed(2);
+            document.getElementById('modal-info').style.display = 'flex';
+        }
+        function abrirConfirmaBaixa(id) {
+            const i = db.find(item => item.id === id);
+            document.getElementById('confirma-nome').innerText = i.nome;
+            document.getElementById('modal-confirma').style.display = 'flex';
+            document.getElementById('confirmar-baixa-btn').onclick = function() {
+                db = db.filter(c => c.id !== id);
+                localStorage.setItem('van_vFinal', JSON.stringify(db));
+                fecharModal('modal-confirma'); render();
+            };
+        }
+        function render() {
+            const lista = document.getElementById('lista-clientes'); lista.innerHTML = "";
+            let somaTotal = 0; const hojeTs = new Date().setHours(0,0,0,0);
+            db.sort((a, b) => a.venci - b.venci);
+            db.forEach(i => {
+                const diff = Math.ceil((i.venci - hojeTs) / (1000*60*60*24));
+                let valorFinal = i.baseCobrar; let multa = 0;
+                let classe = "card-ok", st = `Vence em ${diff}d`;
+                if(diff === 0) { classe = "card-hoje"; st = "HOJE"; }
+                else if(diff < 0) { multa = Math.abs(diff) * 40; valorFinal = i.baseCobrar + multa; classe = "card-atraso"; st = `ATRASADO ${Math.abs(diff)}D`; }
+                somaTotal += valorFinal;
+                lista.innerHTML += `
+                    <div class="cliente-card ${classe}">
+                        <div>
+                            <span style="font-weight: 600;">${i.nome}</span><br>
+                            <span class="valor-receber">R$ ${valorFinal.toFixed(2)}</span>
+                            <span style="font-size:10px; font-weight:bold; opacity:0.8;">${st}</span>
+                            ${multa > 0 ? `<span class="txt-multa">+ R$ ${multa.toFixed(2)} Multa</span>` : ''}
+                        </div>
+                        <div class="acoes-btn">
+                            <button class="baixa-btn" onclick="abrirConfirmaBaixa(${i.id})">BAIXAR</button>
+                            <button class="edit-btn" onclick="abrirEditar(${i.id})">EDITAR</button>
+                            <button class="info-btn" onclick="verInfo(${i.id})">INFO</button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('total-rua').innerText = "R$ " + somaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        }
+    </script>
+</body>
+</html>
