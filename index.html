@@ -8,12 +8,11 @@
 body {
   margin: 0;
   font-family: Arial;
-  background: #111;
-  color: white;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  color: white;
 }
 
 /* FUNDO */
@@ -45,9 +44,10 @@ input {
   margin-top: 10px;
   border: none;
   border-radius: 8px;
+  outline: none;
 }
 
-/* BOTÃO */
+/* BOTÃO BASE */
 button {
   width: 100%;
   padding: 12px;
@@ -57,13 +57,37 @@ button {
   background: #555;
   color: white;
   cursor: not-allowed;
+  transition: 0.3s;
 }
 
+/* BOTÃO ATIVO */
 button.active {
   background: #00c853;
   cursor: pointer;
 }
 
+button:hover.active {
+  background: #00e676;
+}
+
+/* BOTÕES FINAIS */
+#salvarBtn {
+  background: #2196f3;
+  cursor: pointer;
+}
+
+#fecharBtn {
+  background: #e53935;
+  cursor: pointer;
+}
+
+/* INFO */
+#infoBtn {
+  background: #9c27b0;
+  cursor: pointer;
+}
+
+/* ETAPAS */
 .hidden {
   display: none;
 }
@@ -83,6 +107,33 @@ button.active {
   width: 0%;
   background: green;
 }
+
+/* CALENDÁRIO */
+#calendar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#calendar .card {
+  background: #1a1a1a;
+}
+
+.dia {
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 6px;
+}
+
+.verde { background: #1b5e20; }
+.amarelo { background: #f9a825; color: black; }
+.vermelho { background: #b71c1c; }
 </style>
 </head>
 
@@ -124,18 +175,18 @@ button.active {
     <button id="btn3" onclick="next(3)">Próximo</button>
   </div>
 
-  <!-- STEP 4 (NOVO) -->
+  <!-- STEP 4 -->
   <div id="step4" class="hidden">
     <p>Despesas pessoais</p>
     <input type="number" id="pessoal">
     <button onclick="finalizar()">Finalizar</button>
   </div>
 
-  <!-- RESULTADO -->
+  <!-- RESULTADOS -->
   <h3 id="resultado"></h3>
+  <h4 id="depositado"></h4>
 
-  <!-- META -->
-  <h4>🎯 Progresso</h4>
+  <!-- BARRA -->
   <div class="barra">
     <div id="progresso"></div>
   </div>
@@ -143,13 +194,30 @@ button.active {
   <p id="porcentagem">0%</p>
   <p id="status"></p>
 
+  <!-- BOTÕES FINAIS -->
+  <button id="salvarBtn" onclick="salvar()">💾 Salvar</button>
+  <button id="fecharBtn" onclick="fechar()">❌ Fechar</button>
+  <button id="infoBtn" onclick="abrirCalendario()">📅 Info</button>
+
+</div>
+
+<!-- CALENDÁRIO -->
+<div id="calendar" class="hidden">
+  <div class="card">
+
+    <h3>📅 Histórico de Dias</h3>
+
+    <div id="listaDias"></div>
+
+    <button onclick="fecharCalendario()">Fechar</button>
+
+  </div>
 </div>
 
 <script>
 
 const senhaCorreta = "129501";
 const meta = 50000;
-let total = 0;
 
 /* LOGIN */
 function entrar() {
@@ -208,20 +276,18 @@ function finalizar(){
   let pessoal = Number(document.getElementById("pessoal").value || 0);
 
   let lucro = fat - comb - alim;
-
-  let guardado = lucro - pessoal;
-
-  if(guardado > 0){
-    total += guardado;
-  }
-
-  let porcentagem = (total / meta) * 100;
+  let depositado = lucro - pessoal;
 
   document.getElementById("resultado").innerText =
     "Lucro do dia: R$ " + lucro;
 
+  document.getElementById("depositado").innerText =
+    "Depositado hoje: R$ " + depositado;
+
+  let porcentagem = (depositado / meta) * 100;
+
   document.getElementById("porcentagem").innerText =
-    porcentagem.toFixed(1) + "%";
+    porcentagem.toFixed(2) + "%";
 
   document.getElementById("progresso").style.width =
     porcentagem + "%";
@@ -229,7 +295,7 @@ function finalizar(){
   let status = "";
 
   if(porcentagem >= 80){
-    status = "🟢 Verde - ótimo ritmo";
+    status = "🟢 Verde - ótimo dia";
     document.getElementById("progresso").style.background = "green";
   }
   else if(porcentagem >= 50){
@@ -237,11 +303,66 @@ function finalizar(){
     document.getElementById("progresso").style.background = "yellow";
   }
   else{
-    status = "🔴 Vermelho - fora da meta";
+    status = "🔴 Vermelho - baixo desempenho";
+    document.getElementById("status").innerText = status;
     document.getElementById("progresso").style.background = "red";
   }
 
   document.getElementById("status").innerText = status;
+}
+
+/* SALVAR */
+function salvar() {
+
+  let depositado = document.getElementById("depositado").innerText;
+
+  let historico = JSON.parse(localStorage.getItem("azera")) || [];
+
+  historico.push({
+    data: new Date().toLocaleDateString(),
+    valor: depositado
+  });
+
+  localStorage.setItem("azera", JSON.stringify(historico));
+
+  alert("Salvo com sucesso!");
+}
+
+/* FECHAR */
+function fechar() {
+  document.body.innerHTML = "<h2 style='text-align:center;color:white'>App fechado</h2>";
+}
+
+/* CALENDÁRIO */
+function abrirCalendario() {
+
+  document.getElementById("calendar").classList.remove("hidden");
+
+  let dados = JSON.parse(localStorage.getItem("azera")) || [];
+
+  let html = "";
+
+  dados.forEach(d => {
+
+    let valor = Number((d.valor || "0").replace(/[^\d]/g, ""));
+
+    let cor = "vermelho";
+
+    if(valor >= 100) cor = "verde";
+    else if(valor >= 50) cor = "amarelo";
+
+    html += `
+      <div class="dia ${cor}">
+        📅 ${d.data} — R$ ${valor}
+      </div>
+    `;
+  });
+
+  document.getElementById("listaDias").innerHTML = html || "Sem registros";
+}
+
+function fecharCalendario() {
+  document.getElementById("calendar").classList.add("hidden");
 }
 
 </script>
