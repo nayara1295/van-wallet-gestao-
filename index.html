@@ -3,145 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <title>Azera Control</title>
+
 <style>
 body {
-  font-family: Arial;
-  background: #111;
-  color: white;
-  text-align: center;
   margin: 0;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* fundo bonito */
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  color: white;
 }
 
-.login {
-  margin-top: 120px;
+/* cartão central */
+.card {
+  width: 300px;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
+/* título */
+h1 {
+  margin-bottom: 10px;
+}
+
+/* input */
 input {
-  display: block;
-  margin: 10px auto;
-  padding: 10px;
-  width: 220px;
-  border-radius: 5px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
   border: none;
-}
-
-button {
-  padding: 10px 20px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-#app {
-  display: none;
-  padding: 20px;
-}
-
-.barra {
-  width: 80%;
-  height: 20px;
-  background: #333;
-  margin: 10px auto;
   border-radius: 10px;
-  overflow: hidden;
+  outline: none;
+
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 16px;
 }
 
-#progresso {
-  height: 100%;
-  width: 0%;
-  background: green;
+/* botão */
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 10px;
+
+  background: #00c853;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+button:hover {
+  background: #00e676;
+}
+
+/* erro */
+#error {
+  margin-top: 10px;
+  color: #ff5252;
+  font-size: 14px;
 }
 </style>
+
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div class="login" id="login">
+<div class="card">
+
   <h1>🚗 Azera Control</h1>
-  <p>Digite a senha</p>
-  <input type="password" id="senha">
+  <p>Digite sua senha</p>
+
+  <input type="password" id="senha" placeholder="••••••••">
+
   <button onclick="entrar()">Entrar</button>
-</div>
 
-<!-- APP -->
-<div id="app">
-
-  <h2>Dashboard</h2>
-
-  <input id="fat" type="number" placeholder="Faturamento">
-  <input id="comb" type="number" placeholder="Combustível">
-  <input id="alim" type="number" placeholder="Alimentação">
-  <input id="pessoal" type="number" placeholder="Despesas pessoais">
-
-  <button onclick="calcular()">Salvar dia</button>
-
-  <h3>💰 Lucro: <span id="lucro">0</span></h3>
-
-  <h3>🎯 Progresso: <span id="porc">0%</span></h3>
-
-  <div class="barra">
-    <div id="progresso"></div>
-  </div>
-
-  <h3 id="status"></h3>
+  <div id="error"></div>
 
 </div>
 
 <script>
-let senha = "129501";
-let meta = 50000;
-let guardado = 0;
+const senhaCorreta = "129501";
 
 function entrar() {
-  let s = document.getElementById("senha").value;
+  const senha = document.getElementById("senha").value;
 
-  if (s === senha) {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("app").style.display = "block";
+  if (senha === senhaCorreta) {
+    alert("Login ok (próxima tela vem depois)");
   } else {
-    alert("Senha incorreta");
+    document.getElementById("error").innerText = "Senha incorreta";
   }
-}
-
-function calcular() {
-
-  let fat = Number(document.getElementById("fat").value || 0);
-  let comb = Number(document.getElementById("comb").value || 0);
-  let alim = Number(document.getElementById("alim").value || 0);
-  let pessoal = Number(document.getElementById("pessoal").value || 0);
-
-  let lucro = fat - comb - alim;
-
-  document.getElementById("lucro").innerText = lucro;
-
-  let depositado = lucro - pessoal;
-
-  if (depositado > 0) {
-    guardado += depositado;
-  }
-
-  let porcentagem = (guardado / meta) * 100;
-
-  document.getElementById("porc").innerText = porcentagem.toFixed(1) + "%";
-  document.getElementById("progresso").style.width = porcentagem + "%";
-
-  let status = "";
-  let bar = document.getElementById("progresso");
-
-  if (porcentagem >= 80) {
-    status = "🟢 Verde - acima da meta";
-    bar.style.background = "green";
-  } 
-  else if (porcentagem >= 50) {
-    status = "🟡 Amarelo - atenção";
-    bar.style.background = "yellow";
-  } 
-  else {
-    status = "🔴 Vermelho - fora da meta";
-    bar.style.background = "red";
-  }
-
-  document.getElementById("status").innerText = status;
 }
 </script>
 
