@@ -7,108 +7,134 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  height: 100vh;
+  font-family: Arial;
+  background: #111;
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  height: 100vh;
 }
 
-/* FUNDO COM URL */
-body::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
-  background: url("https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1600&q=80") no-repeat center center;
-  background-size: cover;
-
-  filter: brightness(0.45);
-  z-index: -1;
-}
-
-/* CARD */
 .card {
   width: 320px;
-  padding: 30px;
   text-align: center;
-
-  background: rgba(0,0,0,0.65);
+  background: #1a1a1a;
+  padding: 25px;
   border-radius: 15px;
-  backdrop-filter: blur(10px);
-  color: white;
 }
 
-/* INPUT */
+/* inputs */
 input {
   width: 100%;
   padding: 12px;
   margin-top: 15px;
   border: none;
-  border-radius: 10px;
-
-  background: rgba(255,255,255,0.1);
-  color: white;
-  outline: none;
+  border-radius: 8px;
 }
 
-/* BOTÃO */
+/* botão padrão (cinza) */
 button {
   width: 100%;
   padding: 12px;
   margin-top: 15px;
   border: none;
-  border-radius: 10px;
-
-  background: #00c853;
+  border-radius: 8px;
+  background: #555;
   color: white;
-  font-weight: bold;
+  cursor: not-allowed;
+  transition: 0.3s;
+}
+
+/* botão ativo (verde) */
+button.active {
+  background: #00c853;
   cursor: pointer;
 }
 
-button:hover {
+button.active:hover {
   background: #00e676;
 }
 
-/* ERRO */
-#error {
-  margin-top: 10px;
-  color: #ff5252;
-  font-size: 13px;
+/* esconder campos */
+.hidden {
+  display: none;
 }
 </style>
-
 </head>
 
 <body>
 
 <div class="card">
 
-  <h1>🚗 Azera Control</h1>
+  <h2>🚗 Azera Control</h2>
 
-  <input type="password" id="senha" placeholder="Senha">
+  <!-- FATURAMENTO -->
+  <div id="step1">
+    <p>Faturamento bruto diário</p>
+    <input type="number" id="fat">
+    <button id="btn1" onclick="nextStep(1)">Próximo</button>
+  </div>
 
-  <button onclick="entrar()">Entrar</button>
+  <!-- COMBUSTÍVEL -->
+  <div id="step2" class="hidden">
+    <p>Combustível</p>
+    <input type="number" id="comb">
+    <button id="btn2" onclick="nextStep(2)">Próximo</button>
+  </div>
 
-  <div id="error"></div>
+  <!-- ALIMENTAÇÃO -->
+  <div id="step3" class="hidden">
+    <p>Alimentação</p>
+    <input type="number" id="alim">
+    <button id="btn3" onclick="finalizar()">Finalizar</button>
+  </div>
+
+  <h3 id="status"></h3>
 
 </div>
 
 <script>
-const senhaCorreta = "129501";
 
-function entrar() {
-  const senha = document.getElementById("senha").value;
+// ativa botão quando digitar valor
+document.getElementById("fat").addEventListener("input", function(){
+  document.getElementById("btn1").classList.add("active");
+  document.getElementById("btn1").disabled = false;
+});
 
-  if (senha === senhaCorreta) {
-    alert("Login OK");
-  } else {
-    document.getElementById("error").innerText = "Senha incorreta";
+document.getElementById("comb").addEventListener("input", function(){
+  document.getElementById("btn2").classList.add("active");
+  document.getElementById("btn2").disabled = false;
+});
+
+document.getElementById("alim").addEventListener("input", function(){
+  document.getElementById("btn3").classList.add("active");
+  document.getElementById("btn3").disabled = false;
+});
+
+function nextStep(step) {
+
+  if (step === 1) {
+    document.getElementById("step1").classList.add("hidden");
+    document.getElementById("step2").classList.remove("hidden");
   }
+
+  if (step === 2) {
+    document.getElementById("step2").classList.add("hidden");
+    document.getElementById("step3").classList.remove("hidden");
+  }
+}
+
+function finalizar() {
+
+  let fat = Number(document.getElementById("fat").value || 0);
+  let comb = Number(document.getElementById("comb").value || 0);
+  let alim = Number(document.getElementById("alim").value || 0);
+
+  let lucro = fat - comb - alim;
+
+  document.getElementById("status").innerText =
+    "Lucro do dia: R$ " + lucro;
 }
 </script>
 
