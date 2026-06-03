@@ -60,7 +60,6 @@ button {
   transition: 0.3s;
 }
 
-/* BOTÃO ATIVO */
 button.active {
   background: #00c853;
   cursor: pointer;
@@ -81,7 +80,6 @@ button:hover.active {
   cursor: pointer;
 }
 
-/* INFO */
 #infoBtn {
   background: #9c27b0;
   cursor: pointer;
@@ -116,7 +114,8 @@ button:hover.active {
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.8);
-  display: flex;
+
+  display: none;
   justify-content: center;
   align-items: center;
 }
@@ -194,7 +193,7 @@ button:hover.active {
   <p id="porcentagem">0%</p>
   <p id="status"></p>
 
-  <!-- BOTÕES FINAIS -->
+  <!-- BOTÕES -->
   <button id="salvarBtn" onclick="salvar()">💾 Salvar</button>
   <button id="fecharBtn" onclick="fechar()">❌ Fechar</button>
   <button id="infoBtn" onclick="abrirCalendario()">📅 Info</button>
@@ -202,7 +201,7 @@ button:hover.active {
 </div>
 
 <!-- CALENDÁRIO -->
-<div id="calendar" class="hidden">
+<div id="calendar">
   <div class="card">
 
     <h3>📅 Histórico de Dias</h3>
@@ -230,23 +229,6 @@ function entrar() {
     document.getElementById("erro").innerText = "Senha incorreta";
   }
 }
-
-/* BOTÕES ATIVOS */
-document.addEventListener("input", function(e){
-
-  if(e.target.id === "fat") {
-    document.getElementById("btn1").classList.add("active");
-  }
-
-  if(e.target.id === "comb") {
-    document.getElementById("btn2").classList.add("active");
-  }
-
-  if(e.target.id === "alim") {
-    document.getElementById("btn3").classList.add("active");
-  }
-
-});
 
 /* ETAPAS */
 function next(step){
@@ -304,7 +286,6 @@ function finalizar(){
   }
   else{
     status = "🔴 Vermelho - baixo desempenho";
-    document.getElementById("status").innerText = status;
     document.getElementById("progresso").style.background = "red";
   }
 
@@ -336,7 +317,7 @@ function fechar() {
 /* CALENDÁRIO */
 function abrirCalendario() {
 
-  document.getElementById("calendar").classList.remove("hidden");
+  document.getElementById("calendar").style.display = "flex";
 
   let dados = JSON.parse(localStorage.getItem("azera")) || [];
 
@@ -362,7 +343,7 @@ function abrirCalendario() {
 }
 
 function fecharCalendario() {
-  document.getElementById("calendar").classList.add("hidden");
+  document.getElementById("calendar").style.display = "none";
 }
 
 </script>
