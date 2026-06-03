@@ -10,53 +10,62 @@ body {
   font-family: Arial;
   background: #111;
   color: white;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
+/* FUNDO AZERA */
+body::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url("https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1600&q=80") no-repeat center center;
+  background-size: cover;
+  filter: brightness(0.35);
+  z-index: -1;
+}
+
+/* CARD */
 .card {
-  width: 320px;
-  text-align: center;
-  background: #1a1a1a;
+  width: 340px;
   padding: 25px;
+  text-align: center;
+  background: rgba(0,0,0,0.65);
   border-radius: 15px;
+  backdrop-filter: blur(10px);
 }
 
-/* inputs */
+/* INPUT */
 input {
   width: 100%;
   padding: 12px;
-  margin-top: 15px;
+  margin-top: 10px;
   border: none;
   border-radius: 8px;
 }
 
-/* botão padrão (cinza) */
+/* BOTÃO CINZA */
 button {
   width: 100%;
   padding: 12px;
-  margin-top: 15px;
+  margin-top: 12px;
   border: none;
   border-radius: 8px;
   background: #555;
   color: white;
   cursor: not-allowed;
-  transition: 0.3s;
 }
 
-/* botão ativo (verde) */
+/* BOTÃO VERDE */
 button.active {
   background: #00c853;
   cursor: pointer;
 }
 
-button.active:hover {
-  background: #00e676;
-}
-
-/* esconder campos */
+/* etapas */
 .hidden {
   display: none;
 }
@@ -65,67 +74,96 @@ button.active:hover {
 
 <body>
 
-<div class="card">
+<!-- LOGIN -->
+<div class="card" id="login">
 
-  <h2>🚗 Azera Control</h2>
+  <h1>🚗 Azera Control</h1>
+  <p>Digite sua senha</p>
 
-  <!-- FATURAMENTO -->
+  <input type="password" id="senha">
+  <button onclick="entrar()">Entrar</button>
+
+  <p id="erro"></p>
+
+</div>
+
+<!-- APP -->
+<div class="card hidden" id="app">
+
+  <!-- STEP 1 -->
   <div id="step1">
     <p>Faturamento bruto diário</p>
     <input type="number" id="fat">
-    <button id="btn1" onclick="nextStep(1)">Próximo</button>
+    <button id="btn1" onclick="next(1)">Próximo</button>
   </div>
 
-  <!-- COMBUSTÍVEL -->
+  <!-- STEP 2 -->
   <div id="step2" class="hidden">
     <p>Combustível</p>
     <input type="number" id="comb">
-    <button id="btn2" onclick="nextStep(2)">Próximo</button>
+    <button id="btn2" onclick="next(2)">Próximo</button>
   </div>
 
-  <!-- ALIMENTAÇÃO -->
+  <!-- STEP 3 -->
   <div id="step3" class="hidden">
     <p>Alimentação</p>
     <input type="number" id="alim">
     <button id="btn3" onclick="finalizar()">Finalizar</button>
   </div>
 
-  <h3 id="status"></h3>
+  <h3 id="resultado"></h3>
 
 </div>
 
 <script>
 
-// ativa botão quando digitar valor
-document.getElementById("fat").addEventListener("input", function(){
-  document.getElementById("btn1").classList.add("active");
-  document.getElementById("btn1").disabled = false;
+const senhaCorreta = "129501";
+
+/* LOGIN */
+function entrar() {
+  let s = document.getElementById("senha").value;
+
+  if (s === senhaCorreta) {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+  } else {
+    document.getElementById("erro").innerText = "Senha incorreta";
+  }
+}
+
+/* BOTÕES ATIVOS */
+document.addEventListener("input", function(e){
+
+  if(e.target.id === "fat") {
+    document.getElementById("btn1").classList.add("active");
+  }
+
+  if(e.target.id === "comb") {
+    document.getElementById("btn2").classList.add("active");
+  }
+
+  if(e.target.id === "alim") {
+    document.getElementById("btn3").classList.add("active");
+  }
+
 });
 
-document.getElementById("comb").addEventListener("input", function(){
-  document.getElementById("btn2").classList.add("active");
-  document.getElementById("btn2").disabled = false;
-});
+/* ETAPAS */
+function next(step){
 
-document.getElementById("alim").addEventListener("input", function(){
-  document.getElementById("btn3").classList.add("active");
-  document.getElementById("btn3").disabled = false;
-});
-
-function nextStep(step) {
-
-  if (step === 1) {
+  if(step === 1){
     document.getElementById("step1").classList.add("hidden");
     document.getElementById("step2").classList.remove("hidden");
   }
 
-  if (step === 2) {
+  if(step === 2){
     document.getElementById("step2").classList.add("hidden");
     document.getElementById("step3").classList.remove("hidden");
   }
 }
 
-function finalizar() {
+/* FINAL */
+function finalizar(){
 
   let fat = Number(document.getElementById("fat").value || 0);
   let comb = Number(document.getElementById("comb").value || 0);
@@ -133,9 +171,10 @@ function finalizar() {
 
   let lucro = fat - comb - alim;
 
-  document.getElementById("status").innerText =
+  document.getElementById("resultado").innerText =
     "Lucro do dia: R$ " + lucro;
 }
+
 </script>
 
 </body>
